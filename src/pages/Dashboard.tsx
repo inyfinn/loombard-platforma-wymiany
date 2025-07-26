@@ -34,6 +34,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { getPolishVocative } from "@/lib/utils";
 
 interface Widget {
   id: string;
@@ -74,6 +75,10 @@ export default function Dashboard() {
   const [editMode, setEditMode] = useState(false);
   const [totalBalance, setTotalBalance] = useState(125430.50);
   const [baseCurrency, setBaseCurrency] = useState("PLN");
+  const [userName, setUserName] = useState("Jan"); // Default user name - can be fetched from user profile
+  
+  // Example names to test declension (in a real app, this would come from user profile)
+  const exampleNames = ["Jan", "Anna", "Piotr", "Katarzyna", "Michał", "Maria"];
   
   const [balances] = useState<Balance[]>([
     { currency: "PLN", amount: 45230.50, code: "PLN", value: 45230.50 },
@@ -481,8 +486,11 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <h1 className="text-3xl font-bold">Cześć, {getPolishVocative(userName)}</h1>
           <p className="text-muted-foreground">Witaj ponownie! Oto podsumowanie Twojego konta.</p>
+          <div className="text-xs text-muted-foreground mt-1">
+            Demo: {exampleNames.map(name => `${name} → ${getPolishVocative(name)}`).join(', ')}
+          </div>
         </div>
         <div className="flex items-center space-x-2">
           <Button

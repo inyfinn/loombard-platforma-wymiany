@@ -12,11 +12,15 @@ import {
   User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, getPolishVocative } from "@/lib/utils";
 import { Logo } from "./logo";
 
+// Get user name - in a real app this would come from user context/profile
+const userName = "Jan"; // This should be fetched from user profile/context
+// Example: change this to test different names: "Anna", "Piotr", "Katarzyna", "Michał", "Maria"
+
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: `Cześć, ${getPolishVocative(userName)}`, href: "/dashboard", icon: LayoutDashboard },
   { name: "Portfel", href: "/portfel", icon: Wallet },
   { name: "Wymiana", href: "/exchange", icon: ArrowRightLeft },
   { name: "Kursy LIVE", href: "/rates", icon: TrendingUp },
