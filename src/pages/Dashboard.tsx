@@ -38,6 +38,7 @@ import { useNavigate } from "react-router-dom";
 import { getPolishVocative } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 
 interface Widget {
   id: string;
@@ -103,6 +104,8 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
   const [originalWidgets, setOriginalWidgets] = useState<Widget[] | null>(null);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [totalBalance, setTotalBalance] = useState(125430.50);
   const [baseCurrency, setBaseCurrency] = useState("PLN");
   const [userName, setUserName] = useState("Jan"); // Default user name - can be fetched from user profile
@@ -578,17 +581,7 @@ export default function Dashboard() {
                 setOriginalWidgets(widgets);
                 setEditMode(true);
               } else {
-                const t = toast({
-                  description: "Zapisać zmiany w układzie?",
-                  action: (
-                    <ToastAction altText="Zapisz" onClick={() => {
-                      setEditMode(false);
-                      t.dismiss();
-                    }}>
-                      Tak, zapisz
-                    </ToastAction>
-                  ),
-                });
+                setShowSaveDialog(true);
               }
             }}
           >
@@ -607,20 +600,7 @@ export default function Dashboard() {
           {editMode && (
             <Button
               variant="outline"
-              onClick={() => {
-                const t = toast({
-                  description: "Anulować wszystkie zmiany układu?",
-                  action: (
-                    <ToastAction altText="Anuluj" onClick={() => {
-                      if (originalWidgets) setWidgets(originalWidgets);
-                      setEditMode(false);
-                      t.dismiss();
-                    }}>
-                      Tak, anuluj
-                    </ToastAction>
-                  ),
-                });
-              }}
+              onClick={() => setShowCancelDialog(true)}
             >
               <X className="w-4 h-4 mr-2" />
               Anuluj zmiany
@@ -684,5 +664,38 @@ export default function Dashboard() {
         </Card>
       )}
     </div>
-  );
-}
+    {/* Save Dialog */}
+    <AlertDialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Zapisz zmiany układu?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Zastąpią one poprzedni zapisany układ.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Anuluj</AlertDialogCancel>
+          <AlertDialogAction className="bg-primary hover:bg-primary/90" onClick={() => setEditMode(false)}>Tak, zapisz</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+
+    {/* Cancel Dialog */}
+    <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Anulować zmiany układu?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Przywrócony zostanie poprzedni zapisany układ.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Wróć</AlertDialogCancel>
+          <AlertDialogAction className="bg-primary hover:bg-primary/90" onClick={() => {
+            if (originalWidgets) setWidgets(originalWidgets);
+            setEditMode(false);
+          }}>Tak, anuluj</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  </div>
