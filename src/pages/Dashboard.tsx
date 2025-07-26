@@ -36,6 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { useNavigate } from "react-router-dom";
 import { getPolishVocative } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 interface Widget {
   id: string;
@@ -244,8 +245,6 @@ export default function Dashboard() {
 
     setWidgets(updatedWidgets);
   };
-
-  const { toast } = require("../hooks/use-toast");
 
   const toggleWidgetVisibility = (widgetId: string) => {
     setWidgets(prev => {
