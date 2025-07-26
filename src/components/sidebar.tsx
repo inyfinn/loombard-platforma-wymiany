@@ -7,16 +7,21 @@ import {
   History, 
   Settings, 
   Menu,
-  X
+  X,
+  Wallet,
+  User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Logo } from "./logo";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Portfel", href: "/portfel", icon: Wallet },
   { name: "Wymiana", href: "/exchange", icon: ArrowRightLeft },
   { name: "Kursy LIVE", href: "/rates", icon: TrendingUp },
   { name: "Historia", href: "/history", icon: History },
+  { name: "Profil", href: "/profile", icon: User },
   { name: "Ustawienia", href: "/settings", icon: Settings },
 ];
 
@@ -43,14 +48,7 @@ export function Sidebar() {
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border">
-          {!collapsed && (
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-lg currency-card flex items-center justify-center">
-                <ArrowRightLeft className="w-5 h-5" />
-              </div>
-              <span className="font-bold text-lg">Currency Dash</span>
-            </div>
-          )}
+          {!collapsed && <Logo />}
           <Button
             variant="ghost"
             size="icon"

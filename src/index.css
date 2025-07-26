@@ -2,89 +2,104 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Currency Trade Dash Design System
-Inspirowany mockupami finansowymi z fioletowo-granatową kolorystyką
-Wszystkie kolory w HSL dla łatwego przełączania motywów
+/* Loombard Design System
+Zaawansowana platforma wymiany walut - estetyka zgodna z projektem Analytics
+Główny kolor akcentu: #02c349 (zielony)
+Tło trybu ciemnego: #03110c (głęboka zielonkawa czerń)
 */
 
 @layer base {
   :root {
-    /* Jasny motyw (alternatywny) */
-    --background: 210 20% 98%;
-    --foreground: 224 71% 4%;
+    /* Jasny motyw - inspirowany projektem Analytics */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 5%;
 
     --card: 0 0% 100%;
-    --card-foreground: 224 71% 4%;
+    --card-foreground: 0 0% 5%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71% 4%;
+    --popover-foreground: 0 0% 5%;
 
-    --primary: 262 83% 58%;
-    --primary-foreground: 210 20% 98%;
+    --primary: 140 98% 39%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 220 9% 46%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 20%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 142 76% 36%;
-    --accent-foreground: 355 0% 100%;
+    --accent: 140 98% 39%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 20% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 262 83% 58%;
+    --border: 0 0% 91%;
+    --input: 0 0% 91%;
+    --ring: 140 98% 39%;
+
+    --success: 140 98% 39%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 45 93% 47%;
+    --warning-foreground: 0 0% 100%;
 
     --radius: 0.75rem;
 
-    /* Custom design tokens */
-    --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%), hsl(252 83% 68%));
-    --gradient-card: linear-gradient(135deg, hsl(262 83% 58%), hsl(252 83% 68%));
-    --gradient-accent: linear-gradient(135deg, hsl(142 76% 36%), hsl(152 76% 46%));
-    --shadow-primary: 0 10px 40px -10px hsl(262 83% 58% / 0.4);
-    --shadow-card: 0 4px 20px -4px hsl(262 83% 58% / 0.1);
+    /* Loombard custom design tokens - jasny motyw */
+    --gradient-primary: linear-gradient(135deg, hsl(140 98% 39%), hsl(140 98% 45%));
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(0 0% 98%));
+    --gradient-accent: linear-gradient(135deg, hsl(140 98% 39%), hsl(140 98% 45%));
+    --shadow-primary: 0 10px 40px -10px hsl(140 98% 39% / 0.3);
+    --shadow-card: 0 4px 20px -4px hsl(0 0% 0% / 0.05);
+    --shadow-widget: 0 2px 10px -2px hsl(0 0% 0% / 0.08);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
-    /* Ciemny motyw (domyślny) */
-    --background: 224 71% 4%;
-    --foreground: 210 20% 98%;
+    /* Ciemny motyw - głęboka zielonkawa czerń */
+    --background: 140 58% 3%;
+    --foreground: 0 0% 98%;
 
-    --card: 224 71% 6%;
-    --card-foreground: 210 20% 98%;
+    --card: 140 50% 4%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 224 71% 6%;
-    --popover-foreground: 210 20% 98%;
+    --popover: 140 50% 4%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 262 83% 58%;
-    --primary-foreground: 210 20% 98%;
+    --primary: 140 98% 39%;
+    --primary-foreground: 0 0% 5%;
 
-    --secondary: 215 27% 12%;
-    --secondary-foreground: 210 20% 98%;
+    --secondary: 140 30% 8%;
+    --secondary-foreground: 0 0% 85%;
 
-    --muted: 215 27% 12%;
-    --muted-foreground: 217 10% 64%;
+    --muted: 140 30% 8%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 142 76% 36%;
-    --accent-foreground: 355 0% 100%;
+    --accent: 140 98% 39%;
+    --accent-foreground: 0 0% 5%;
 
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 20% 98%;
+    --destructive: 0 75% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 215 27% 12%;
-    --input: 215 27% 12%;
-    --ring: 262 83% 58%;
+    --border: 140 30% 12%;
+    --input: 140 30% 12%;
+    --ring: 140 98% 39%;
+
+    --success: 140 98% 39%;
+    --success-foreground: 0 0% 5%;
+
+    --warning: 45 93% 47%;
+    --warning-foreground: 0 0% 5%;
 
     /* Dark mode gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%), hsl(252 83% 68%));
-    --gradient-card: linear-gradient(135deg, hsl(224 71% 8%), hsl(234 71% 12%));
-    --gradient-accent: linear-gradient(135deg, hsl(142 76% 36%), hsl(152 76% 46%));
-    --shadow-primary: 0 10px 40px -10px hsl(262 83% 58% / 0.6);
-    --shadow-card: 0 4px 20px -4px hsl(0 0% 0% / 0.3);
+    --gradient-primary: linear-gradient(135deg, hsl(140 98% 39%), hsl(140 98% 45%));
+    --gradient-card: linear-gradient(135deg, hsl(140 50% 4%), hsl(140 50% 6%));
+    --gradient-accent: linear-gradient(135deg, hsl(140 98% 39%), hsl(140 98% 45%));
+    --shadow-primary: 0 10px 40px -10px hsl(140 98% 39% / 0.4);
+    --shadow-card: 0 4px 20px -4px hsl(0 0% 0% / 0.4);
+    --shadow-widget: 0 2px 10px -2px hsl(0 0% 0% / 0.3);
   }
 }
 
@@ -99,28 +114,60 @@ Wszystkie kolory w HSL dla łatwego przełączania motywów
 }
 
 @layer components {
-  .currency-card {
-    @apply bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-xl p-6 shadow-lg;
-    background: var(--gradient-card);
+  /* Loombard Widget Cards */
+  .widget-card {
+    @apply bg-card border border-border rounded-xl p-6 transition-all duration-300;
+    box-shadow: var(--shadow-widget);
+  }
+
+  .widget-card:hover {
     box-shadow: var(--shadow-card);
   }
 
-  .accent-button {
-    @apply bg-gradient-to-r from-accent to-accent/90 text-accent-foreground hover:from-accent/90 hover:to-accent;
-    background: var(--gradient-accent);
+  /* Currency Cards */
+  .currency-card {
+    @apply bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 text-card-foreground rounded-xl p-6;
+    box-shadow: var(--shadow-widget);
+  }
+
+  /* Loombard Buttons */
+  .loombard-button-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 font-medium;
     transition: var(--transition-smooth);
   }
 
+  .loombard-button-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border rounded-lg px-4 py-2 font-medium;
+    transition: var(--transition-smooth);
+  }
+
+  .accent-button {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 font-medium;
+    transition: var(--transition-smooth);
+  }
+
+  /* Rate indicators */
   .rate-up {
-    @apply text-green-500;
+    @apply text-success;
   }
 
   .rate-down {
-    @apply text-red-500;
+    @apply text-destructive;
   }
 
+  /* Animations */
   .animate-pulse-value {
     animation: pulse-value 0.5s ease-in-out;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  /* Logo styles */
+  .logo-l {
+    @apply text-primary font-bold text-2xl tracking-tight;
+    font-family: system-ui, -apple-system, sans-serif;
   }
 }
 
@@ -137,4 +184,13 @@ Wszystkie kolory w HSL dla łatwego przełączania motywów
   0% { transform: scale(1); }
   50% { transform: scale(1.05); }
   100% { transform: scale(1); }
+}
+
+@keyframes glow {
+  0% { 
+    box-shadow: 0 0 5px hsl(var(--primary) / 0.5);
+  }
+  100% { 
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.8);
+  }
 }
