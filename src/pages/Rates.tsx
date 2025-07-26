@@ -22,7 +22,7 @@ interface CurrencyRate {
 export default function Rates() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterCurrency, setFilterCurrency] = useState("");
+  const [filterCurrency, setFilterCurrency] = useState("all");
   const [sortBy, setSortBy] = useState<"pair" | "rate" | "change" | "volume">("pair");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
