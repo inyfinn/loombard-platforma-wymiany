@@ -9,7 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { usePortfolio } from "../context/PortfolioContext";
 
 interface Currency {
   code: string;
@@ -21,7 +22,6 @@ interface Currency {
 
 export default function Exchange() {
   const navigate = useNavigate();
-  const location = useLocation();
   const [activeTab, setActiveTab] = useState("market");
   
   // Exchange state
@@ -106,8 +106,12 @@ export default function Exchange() {
     setIsConfirmed(false);
   };
 
+  const { exchange: recordExchange } = usePortfolio();
+
   const handleConfirm = () => {
     setIsConfirmed(true);
+    // update portfolio
+    recordExchange(fromCurrency, toCurrency, parseFloat(amount), rate);
     // Here you would typically make an API call
     setTimeout(() => {
       setShowConfirmation(false);

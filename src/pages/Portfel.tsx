@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { usePortfolio } from "../context/PortfolioContext";
 import { ArrowLeft, Plus, Minus, ArrowRightLeft, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,12 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 
 interface Balance {
-  currency: string;
   code: string;
   amount: number;
-  value: number;
-  change24h: number;
-  flag: string;
 }
 
 export default function Portfel() {
@@ -19,58 +16,9 @@ export default function Portfel() {
   const [showValues, setShowValues] = useState(true);
   const [baseCurrency] = useState("PLN");
 
-  const balances: Balance[] = [
-    {
-      currency: "Złoty Polski",
-      code: "PLN",
-      amount: 45230.50,
-      value: 45230.50,
-      change24h: 0,
-      flag: "🇵🇱"
-    },
-    {
-      currency: "Euro",
-      code: "EUR",
-      amount: 12500.00,
-      value: 54050.00,
-      change24h: 2.4,
-      flag: "🇪🇺"
-    },
-    {
-      currency: "Dolar Amerykański",
-      code: "USD",
-      amount: 8900.00,
-      value: 35490.00,
-      change24h: -1.2,
-      flag: "🇺🇸"
-    },
-    {
-      currency: "Funt Brytyjski",
-      code: "GBP",
-      amount: 3200.00,
-      value: 16396.80,
-      change24h: 1.8,
-      flag: "🇬🇧"
-    },
-    {
-      currency: "Frank Szwajcarski",
-      code: "CHF",
-      amount: 1500.00,
-      value: 6750.00,
-      change24h: 0.5,
-      flag: "🇨🇭"
-    },
-    {
-      currency: "Korona Czeska",
-      code: "CZK",
-      amount: 25000.00,
-      value: 4250.00,
-      change24h: -0.3,
-      flag: "🇨🇿"
-    }
-  ];
+  const { balances } = usePortfolio();
 
-  const totalValue = balances.reduce((sum, balance) => sum + balance.value, 0);
+  const totalValue = balances.reduce((sum, balance) => sum + balance.amount, 0);
 
   const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('pl-PL', {

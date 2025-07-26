@@ -22,7 +22,7 @@ interface CurrencyRate {
 export default function Rates() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterCurrency, setFilterCurrency] = useState("all");
+  const [filterCurrency, setFilterCurrency] = useState("");
   const [sortBy, setSortBy] = useState<"pair" | "rate" | "change" | "volume">("pair");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
@@ -47,18 +47,31 @@ export default function Rates() {
     { pair: "AUD/USD", base: "AUD", quote: "USD", rate: 0.6723, change: 0.12, volume: 680000, high24h: 0.6740, low24h: 0.6700, lastUpdate: "2024-01-15T10:30:00Z" },
   ]);
 
-  // Symulacja aktualizacji kursów co 1 sekundę
+  // Pobieranie kursów z API co 5 s
   useEffect(() => {
-    const interval = setInterval(() => {
-      setRates(prevRates => prevRates.map(rate => ({
-        ...rate,
-        rate: rate.rate + (Math.random() - 0.5) * 0.001,
-        change: rate.change + (Math.random() - 0.5) * 0.01,
-        lastUpdate: new Date().toISOString()
-      })));
-    }, 1000);
-
-    return () => clearInterval(interval);
+    const fetchRates = async () => {
+      try {
+        const res = await fetch("https://api.exchangerate.host/latest?base=PLN");
+        const data = await res.json();
+        if (data && data.rates) {
+          const entries: CurrencyRate[] = Object.keys(data.rates).map(code => ({
+            pair: `${code}/PLN`,
+            base: code,
+            quote: "PLN",
+            rate: parseFloat((1 / data.rates[code]).toFixed(4)),
+            change: 0,
+            volume: 0,
+            high24h: 0,
+            low24h: 0,
+            lastUpdate: new Date().toISOString()
+          }));
+          setRates(entries);
+        }
+      } catch {}
+    };
+    fetchRates();
+    const intId = setInterval(fetchRates, 5000);
+    return () => clearInterval(intId);
   }, []);
 
   const formatCurrency = (amount: number, currency: string) => {

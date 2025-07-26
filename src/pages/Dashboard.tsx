@@ -244,10 +244,25 @@ export default function Dashboard() {
     setWidgets(updatedWidgets);
   };
 
+  const { toast } = require("../hooks/use-toast");
+
   const toggleWidgetVisibility = (widgetId: string) => {
-    setWidgets(prev => prev.map(widget => 
-      widget.id === widgetId ? { ...widget, visible: !widget.visible } : widget
-    ));
+    setWidgets(prev => {
+      const updated = prev.map(w => w.id === widgetId ? { ...w, visible: false } : w);
+      const removed = prev.find(w => w.id === widgetId);
+      if (removed) {
+        toast({
+          description: `${removed.title} został ukryty`,
+          action: {
+            label: "Cofnij",
+            onClick: () => {
+              setWidgets(p => p.map(w => w.id === widgetId ? { ...w, visible: true } : w));
+            }
+          }
+        });
+      }
+      return updated;
+    });
   };
 
   const renderWidget = (widget: Widget) => {
