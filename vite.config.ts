@@ -4,9 +4,10 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command, mode }) => ({
-  // Ustawienie ścieżki bazowej dla produkcyjnego builda na GitHub Pages
-  base: command === "build" ? "/loombard-platforma-wymiany/" : "/",
+export default defineConfig(({ mode }) => ({
+  // Stała ścieżka bazowa – niezmienna dla builda i dev.
+  // Vite w trybie dev ignoruje "base", więc nie wpływa to na localhost.
+  base: "/loombard-platforma-wymiany/",
   server: {
     host: "::",
     port: 8080,
