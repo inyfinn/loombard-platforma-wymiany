@@ -100,6 +100,7 @@ function SortableWidget({ id, children }: SortableWidgetProps) {
 export default function Dashboard() {
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
+  const [originalWidgets, setOriginalWidgets] = useState<Widget[] | null>(null);
   const [totalBalance, setTotalBalance] = useState(125430.50);
   const [baseCurrency, setBaseCurrency] = useState("PLN");
   const [userName, setUserName] = useState("Jan"); // Default user name - can be fetched from user profile
@@ -572,7 +573,22 @@ export default function Dashboard() {
         <div className="flex items-center space-x-2">
           <Button
             variant={editMode ? "default" : "outline"}
-            onClick={() => setEditMode(!editMode)}
+            onClick={() => {
+              if (!editMode) {
+                setOriginalWidgets(widgets);
+                setEditMode(true);
+              } else {
+                toast({
+                  description: "Zapisać zmiany w układzie?",
+                  action: {
+                    label: "Tak, zapisz",
+                    onClick: () => {
+                      setEditMode(false);
+                    },
+                  },
+                });
+              }
+            }}
           >
             {editMode ? (
               <>
@@ -586,6 +602,26 @@ export default function Dashboard() {
               </>
             )}
           </Button>
+          {editMode && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                toast({
+                  description: "Anulować wszystkie zmiany układu?",
+                  action: {
+                    label: "Tak, anuluj",
+                    onClick: () => {
+                      if (originalWidgets) setWidgets(originalWidgets);
+                      setEditMode(false);
+                    },
+                  },
+                });
+              }}
+            >
+              <X className="w-4 h-4 mr-2" />
+              Anuluj zmiany
+            </Button>
+          )}
         </div>
       </div>
 
