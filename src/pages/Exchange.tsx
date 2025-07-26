@@ -113,8 +113,7 @@ export default function Exchange() {
       setShowConfirmation(false);
       setCountdown(15);
       setIsConfirmed(false);
-      navigate('/history');
-    }, 2000);
+    }, 1000);
   };
 
   const { result, feeAmount } = calculateResult();
@@ -381,13 +380,13 @@ export default function Exchange() {
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Czas na anulowanie:</span>
-                <span className={isCountdownCritical ? "text-red-500 font-medium" : ""}>
+                <span className={isCountdownCritical ? "animate-pulse font-medium" : ""}>
                   {countdown}s
                 </span>
               </div>
               <Progress 
                 value={(countdown / 15) * 100} 
-                className={isCountdownCritical ? "bg-red-100" : ""}
+                className={isCountdownCritical ? "animate-pulse" : ""}
               />
             </div>
 
@@ -405,9 +404,9 @@ export default function Exchange() {
                 Anuluj
               </Button>
               <Button
-                className={`flex-1 ${isCountdownCritical ? "bg-red-500 hover:bg-red-600" : ""}`}
+                className={`flex-1 ${isCountdownCritical ? "animate-pulse" : ""}`}
                 onClick={handleConfirm}
-                disabled={countdown > 13 || isConfirmed}
+                disabled={countdown > 14 || isConfirmed}
               >
                 {isConfirmed ? (
                   <>

@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { 
   ArrowUpRight, 
   ArrowDownRight, 
@@ -67,6 +70,32 @@ interface Rate {
   rate: number;
   change: number;
   volume: number;
+}
+
+interface SortableWidgetProps {
+  id: string;
+  children: React.ReactNode;
+}
+
+function SortableWidget({ id, children }: SortableWidgetProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      {children}
+    </div>
+  );
 }
 
 export default function Dashboard() {
@@ -141,6 +170,24 @@ export default function Dashboard() {
     { id: "portfolio-chart", type: "portfolio-chart", title: "Wykres Portfela", size: "large", position: 7, visible: true },
   ]);
 
+  // DnD sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    })
+  );
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = widgets.findIndex(w => w.id === active.id);
+    const newIndex = widgets.findIndex(w => w.id === over.id);
+    const newWidgets = arrayMove(widgets, oldIndex, newIndex).map((w, idx) => ({ ...w, position: idx }));
+    setWidgets(newWidgets);
+  };
+
   // Aktualizacja w czasie rzeczywistym co 1 sekundę
   useEffect(() => {
     const interval = setInterval(() => {
@@ -148,6 +195,24 @@ export default function Dashboard() {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Persist widgets layout
+  useEffect(() => {
+    const saved = localStorage.getItem("loombard-widgets");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setWidgets(parsed);
+        }
+      } catch {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("loombard-widgets", JSON.stringify(widgets));
+  }, [widgets]);
 
   const formatCurrency = (amount: number, currency: string) => {
     const safeCurrency = /^[A-Z]{3}$/.test(currency) ? currency : 'PLN';
@@ -511,16 +576,20 @@ export default function Dashboard() {
       </div>
 
       {/* Widgets Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {widgets
-          .filter(widget => widget.visible)
-          .sort((a, b) => a.position - b.position)
-          .map((widget, index) => (
-            <div key={widget.id}>
-              {renderWidget(widget)}
-            </div>
-          ))}
-      </div>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={widgets.filter(w => w.visible).sort((a,b)=>a.position-b.position).map(w=>w.id)} strategy={verticalListSortingStrategy}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {widgets
+              .filter(widget => widget.visible)
+              .sort((a, b) => a.position - b.position)
+              .map((widget) => (
+                <SortableWidget key={widget.id} id={widget.id}>
+                  {renderWidget(widget)}
+                </SortableWidget>
+              ))}
+          </div>
+        </SortableContext>
+      </DndContext>
 
       {/* Widget Library (visible only in edit mode) */}
       {editMode && (

@@ -20,7 +20,7 @@ const userName = "Jan"; // This should be fetched from user profile/context
 // Example: change this to test different names: "Anna", "Piotr", "Katarzyna", "Michał", "Maria"
 
 const navigation = [
-  { name: `Cześć, ${getPolishVocative(userName)}`, href: "/dashboard", icon: LayoutDashboard },
+  { name: "Panel główny", href: "/dashboard", icon: LayoutDashboard },
   { name: "Portfel", href: "/portfel", icon: Wallet },
   { name: "Wymiana", href: "/exchange", icon: ArrowRightLeft },
   { name: "Kursy LIVE", href: "/rates", icon: TrendingUp },

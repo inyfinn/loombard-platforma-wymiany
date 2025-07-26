@@ -84,7 +84,7 @@ export default function Rates() {
                            rate.base.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            rate.quote.toLowerCase().includes(searchTerm.toLowerCase());
       
-      const matchesFilter = !filterCurrency || 
+      const matchesFilter = !filterCurrency || filterCurrency === "all" || 
                            rate.base === filterCurrency || 
                            rate.quote === filterCurrency;
       
@@ -179,7 +179,7 @@ export default function Rates() {
                   <SelectValue placeholder="Wszystkie waluty" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Wszystkie waluty</SelectItem>
+                  <SelectItem value="all">Wszystkie waluty</SelectItem>
                   {allCurrencies.map(currency => (
                     <SelectItem key={currency} value={currency}>
                       {currency}

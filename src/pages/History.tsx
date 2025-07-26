@@ -24,9 +24,9 @@ interface Transaction {
 export default function History() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
-  const [filterCurrency, setFilterCurrency] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterCurrency, setFilterCurrency] = useState("all");
 
   const transactions: Transaction[] = [
     {
@@ -290,9 +290,9 @@ export default function History() {
                          transaction.from.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          transaction.to.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesType = !filterType || transaction.type === filterType;
-    const matchesStatus = !filterStatus || transaction.status === filterStatus;
-    const matchesCurrency = !filterCurrency || 
+    const matchesType = filterType === "all" || transaction.type === filterType;
+    const matchesStatus = filterStatus === "all" || transaction.status === filterStatus;
+    const matchesCurrency = filterCurrency === "all" || 
                            transaction.from === filterCurrency || 
                            transaction.to === filterCurrency;
     
@@ -385,7 +385,7 @@ export default function History() {
                   <SelectValue placeholder="Wszystkie typy" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Wszystkie typy</SelectItem>
+                  <SelectItem value="all">Wszystkie typy</SelectItem>
                   <SelectItem value="exchange">Wymiana</SelectItem>
                   <SelectItem value="deposit">Wpłata</SelectItem>
                   <SelectItem value="withdrawal">Wypłata</SelectItem>
@@ -401,7 +401,7 @@ export default function History() {
                   <SelectValue placeholder="Wszystkie statusy" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Wszystkie statusy</SelectItem>
+                  <SelectItem value="all">Wszystkie statusy</SelectItem>
                   <SelectItem value="completed">Zakończone</SelectItem>
                   <SelectItem value="pending">Oczekujące</SelectItem>
                   <SelectItem value="cancelled">Anulowane</SelectItem>
@@ -417,7 +417,7 @@ export default function History() {
                   <SelectValue placeholder="Wszystkie waluty" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Wszystkie waluty</SelectItem>
+                  <SelectItem value="all">Wszystkie waluty</SelectItem>
                   <SelectItem value="PLN">PLN</SelectItem>
                   <SelectItem value="EUR">EUR</SelectItem>
                   <SelectItem value="USD">USD</SelectItem>

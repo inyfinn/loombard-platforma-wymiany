@@ -15,7 +15,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
       {/* Search */}
-      <div className="flex items-center space-x-4 flex-1 max-w-md">
+      <div className="flex items-center space-x-4 flex-1 max-w-md ml-12 sm:ml-0">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input 
