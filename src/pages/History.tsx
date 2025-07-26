@@ -221,9 +221,10 @@ export default function History() {
   ];
 
   const formatCurrency = (amount: number, currency: string) => {
+    const safeCurrency = /^[A-Z]{3}$/.test(currency) ? currency : "PLN";
     return new Intl.NumberFormat('pl-PL', {
       style: 'currency',
-      currency: currency,
+      currency: safeCurrency,
       minimumFractionDigits: 2,
     }).format(amount);
   };
