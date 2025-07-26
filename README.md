@@ -1,6 +1,64 @@
 # Loombard - Platforma Wymiany Walut
 
-Platforma do wymiany walut z nowoczesnym interfejsem użytkownika.
+Zaawansowana platforma wymiany walut z w pełni konfigurowalnym dashboardem, drag & drop widgetami i nowoczesnym interfejsem użytkownika.
+
+## 🚀 Funkcjonalności
+
+### Dashboard
+- **W pełni konfigurowalny pulpit** z drag & drop widgetami
+- **Tryb edycji** pozwalający na dodawanie, usuwanie i przestawianie widgetów
+- **Widgety**: Saldo całkowite, Kursy LIVE, Alerty cenowe, Ostatnie transakcje, AI Doradza, Wykres portfela
+- **Aktualizacje w czasie rzeczywistym** co 1 sekundę
+
+### Portfel
+- **Lista wszystkich posiadanych walut** z flagami i wartościami
+- **Przyciski akcji**: Kup, Sprzedaj, Wymień dla każdej waluty
+- **Ukrywanie wartości** dla prywatności
+- **Statystyki**: Największy zysk/strata, ostatnia wymiana
+
+### Wymiana Walut
+- **Zakładki**: Wymiana Natychmiastowa (Market) i Zlecenie z Limitem Ceny (Limit)
+- **Modal potwierdzenia** z 15-sekundowym odliczaniem
+- **Dynamiczne kursy** aktualizowane w czasie rzeczywistym
+- **Kalkulator z opłatami** i podatkami
+
+### Kursy LIVE
+- **Pełna lista walut ISO 4217** z zaawansowanym filtrowaniem
+- **Wyszukiwanie** z obsługą aliasów i wildcardów
+- **Sortowanie** według pary, kursu, zmiany, wolumenu
+- **Przyciski akcji** w zależności od posiadanych walut
+
+### Historia Transakcji
+- **Szczegółowe transakcje** z zyskiem/stratą
+- **Filtrowanie** po typie, statusie, walucie
+- **Eksport** danych
+- **Statystyki** łączne
+
+### Profil Użytkownika
+- **Centrum analityczne** z wykresami zysków
+- **Predykcje AI** dla posiadanych walut
+- **Wiadomości ze świata** filtrowane do posiadanych walut
+- **Edycja danych** profilowych
+
+### Alerty Cenowe
+- **Tworzenie alertów** z warunkami "powyżej/poniżej"
+- **Różne kanały powiadomień**: Email, SMS, Push, Wszystkie
+- **Historia wyzwolonych alertów**
+- **Edytowanie i usuwanie** alertów
+
+### Ustawienia Powiadomień
+- **Konfiguracja kanałów**: Email, SMS, Push
+- **Ciche godziny** i częstotliwość
+- **Raporty zaplanowane**: Dzienny, tygodniowy, miesięczny
+- **Status kanałów** i statystyki
+
+## 🎨 Design System
+
+- **Główny kolor akcentu**: #02c349 (zielony)
+- **Tło trybu ciemnego**: Głęboka zielonkawa czerń
+- **Inspiracja**: Projekt Analytics z zaokrąglonymi rogami i subtelnymi cieniami
+- **W pełni responsywny** design
+- **Tryb jasny i ciemny** z płynnymi przejściami
 
 ## 🚀 Deployment
 

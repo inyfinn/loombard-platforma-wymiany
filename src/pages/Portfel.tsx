@@ -1,37 +1,76 @@
-import { ArrowLeft, Plus, Minus, ArrowRightLeft } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Plus, Minus, ArrowRightLeft, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+
+interface Balance {
+  currency: string;
+  code: string;
+  amount: number;
+  value: number;
+  change24h: number;
+  flag: string;
+}
 
 export default function Portfel() {
   const navigate = useNavigate();
+  const [showValues, setShowValues] = useState(true);
+  const [baseCurrency] = useState("PLN");
 
-  const currencies = [
-    { 
-      code: "PLN", 
-      name: "Polski złoty", 
-      flag: "🇵🇱", 
-      amount: 45230.50, 
+  const balances: Balance[] = [
+    {
+      currency: "Złoty Polski",
+      code: "PLN",
+      amount: 45230.50,
       value: 45230.50,
-      change: 0 
+      change24h: 0,
+      flag: "🇵🇱"
     },
-    { 
-      code: "EUR", 
-      name: "Euro", 
-      flag: "🇪🇺", 
-      amount: 12500.00, 
-      value: 54000.00,
-      change: 2.4 
+    {
+      currency: "Euro",
+      code: "EUR",
+      amount: 12500.00,
+      value: 54050.00,
+      change24h: 2.4,
+      flag: "🇪🇺"
     },
-    { 
-      code: "USD", 
-      name: "Dolar amerykański", 
-      flag: "🇺🇸", 
-      amount: 8900.00, 
-      value: 35560.00,
-      change: -1.2 
+    {
+      currency: "Dolar Amerykański",
+      code: "USD",
+      amount: 8900.00,
+      value: 35490.00,
+      change24h: -1.2,
+      flag: "🇺🇸"
     },
+    {
+      currency: "Funt Brytyjski",
+      code: "GBP",
+      amount: 3200.00,
+      value: 16396.80,
+      change24h: 1.8,
+      flag: "🇬🇧"
+    },
+    {
+      currency: "Frank Szwajcarski",
+      code: "CHF",
+      amount: 1500.00,
+      value: 6750.00,
+      change24h: 0.5,
+      flag: "🇨🇭"
+    },
+    {
+      currency: "Korona Czeska",
+      code: "CZK",
+      amount: 25000.00,
+      value: 4250.00,
+      change24h: -0.3,
+      flag: "🇨🇿"
+    }
   ];
+
+  const totalValue = balances.reduce((sum, balance) => sum + balance.value, 0);
 
   const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('pl-PL', {
@@ -41,97 +80,180 @@ export default function Portfel() {
     }).format(amount);
   };
 
+  const formatPercentage = (value: number) => {
+    return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center space-x-4">
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => navigate(-1)}
-          className="rounded-full"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">Portfel</h1>
-          <p className="text-muted-foreground">Zarządzaj swoimi walutami</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="hover:bg-muted"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Mój Portfel</h1>
+            <p className="text-muted-foreground">Zarządzaj swoimi walutami</p>
+          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setShowValues(!showValues)}
+          >
+            {showValues ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </Button>
+          <Button onClick={() => navigate('/exchange')}>
+            <Plus className="w-4 h-4 mr-2" />
+            Dodaj walutę
+          </Button>
         </div>
       </div>
 
-      {/* Total Portfolio Value */}
-      <Card className="widget-card">
-        <CardHeader>
-          <CardTitle>Wartość całkowita portfela</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold text-primary">
-            {formatCurrency(134790.50, 'PLN')}
-          </div>
-          <div className="text-sm text-success flex items-center mt-2">
-            +2.8% w tym tygodniu
+      {/* Total Balance Card */}
+      <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Całkowita wartość portfela</p>
+              <p className="text-3xl font-bold">
+                {showValues ? formatCurrency(totalValue, baseCurrency) : '••••••••'}
+              </p>
+            </div>
+            <div className="text-right">
+              <Badge variant="default" className="mb-2">
+                +2.4% dziś
+              </Badge>
+              <p className="text-sm text-muted-foreground">
+                {balances.length} walut
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Currency List */}
-      <div className="space-y-4">
-        {currencies.map((currency) => (
-          <Card key={currency.code} className="widget-card">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
+      {/* Balances List */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Twoje waluty</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {balances.map((balance) => (
+              <div
+                key={balance.code}
+                className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors"
+              >
+                {/* Currency Info */}
                 <div className="flex items-center space-x-4">
-                  <div className="text-2xl">{currency.flag}</div>
+                  <div className="text-2xl">{balance.flag}</div>
                   <div>
-                    <div className="font-semibold">{currency.code}</div>
-                    <div className="text-sm text-muted-foreground">{currency.name}</div>
+                    <div className="font-medium">{balance.currency}</div>
+                    <div className="text-sm text-muted-foreground">{balance.code}</div>
                   </div>
                 </div>
-                
+
+                {/* Amount and Value */}
                 <div className="text-right">
-                  <div className="font-bold">
-                    {formatCurrency(currency.amount, currency.code)}
+                  <div className="font-medium">
+                    {showValues ? formatCurrency(balance.amount, balance.code) : '••••••••'}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    ≈ {formatCurrency(currency.value, 'PLN')}
+                    {showValues ? formatCurrency(balance.value, baseCurrency) : '••••••••'}
                   </div>
-                  {currency.change !== 0 && (
-                    <div className={`text-xs ${currency.change > 0 ? 'text-success' : 'text-destructive'}`}>
-                      {currency.change > 0 ? '+' : ''}{currency.change}%
-                    </div>
+                  {balance.change24h !== 0 && (
+                    <Badge 
+                      variant={balance.change24h >= 0 ? "default" : "destructive"}
+                      className="mt-1"
+                    >
+                      {formatPercentage(balance.change24h)}
+                    </Badge>
                   )}
                 </div>
-                
-                <div className="flex space-x-2">
-                  <Button 
-                    size="sm" 
+
+                {/* Actions */}
+                <div className="flex items-center space-x-2">
+                  <Button
                     variant="outline"
-                    className="loombard-button-secondary"
+                    size="sm"
+                    onClick={() => navigate('/exchange', { state: { action: 'buy', currency: balance.code } })}
                   >
                     <Plus className="w-4 h-4 mr-1" />
                     Kup
                   </Button>
-                  <Button 
-                    size="sm" 
+                  <Button
                     variant="outline"
-                    className="loombard-button-secondary"
+                    size="sm"
+                    onClick={() => navigate('/exchange', { state: { action: 'sell', currency: balance.code } })}
                   >
                     <Minus className="w-4 h-4 mr-1" />
                     Sprzedaj
                   </Button>
-                  <Button 
+                  <Button
+                    variant="outline"
                     size="sm"
-                    className="loombard-button-primary"
-                    onClick={() => navigate('/exchange')}
+                    onClick={() => navigate('/exchange', { state: { action: 'exchange', currency: balance.code } })}
                   >
                     <ArrowRightLeft className="w-4 h-4 mr-1" />
                     Wymień
                   </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        ))}
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
+                <Plus className="w-4 h-4 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Największy zysk</p>
+                <p className="font-medium">EUR +2.4%</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center">
+                <Minus className="w-4 h-4 text-red-600" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Największa strata</p>
+                <p className="font-medium">USD -1.2%</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
+                <ArrowRightLeft className="w-4 h-4 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Ostatnia wymiana</p>
+                <p className="font-medium">EUR → PLN</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

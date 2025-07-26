@@ -1,105 +1,89 @@
 import { useState, useEffect } from "react";
-import { ArrowRightLeft, Zap, TrendingUp } from "lucide-react";
+import { ArrowLeft, ArrowRightLeft, Clock, AlertTriangle, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { useNavigate, useLocation } from "react-router-dom";
 
-// Lista głównych walut FIAT
-const currencies = [
-  { code: "PLN", name: "Polski Złoty", flag: "🇵🇱" },
-  { code: "EUR", name: "Euro", flag: "🇪🇺" },
-  { code: "USD", name: "Dolar Amerykański", flag: "🇺🇸" },
-  { code: "GBP", name: "Funt Brytyjski", flag: "🇬🇧" },
-  { code: "CHF", name: "Frank Szwajcarski", flag: "🇨🇭" },
-  { code: "JPY", name: "Jen Japoński", flag: "🇯🇵" },
-  { code: "CAD", name: "Dolar Kanadyjski", flag: "🇨🇦" },
-  { code: "AUD", name: "Dolar Australijski", flag: "🇦🇺" },
-  { code: "SEK", name: "Korona Szwedzka", flag: "🇸🇪" },
-  { code: "NOK", name: "Korona Norweska", flag: "🇳🇴" },
-];
+interface Currency {
+  code: string;
+  name: string;
+  flag: string;
+  rate: number;
+  available: number;
+}
 
 export default function Exchange() {
-  const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState("market");
+  
+  // Exchange state
   const [fromCurrency, setFromCurrency] = useState("EUR");
   const [toCurrency, setToCurrency] = useState("PLN");
-  const [fromAmount, setFromAmount] = useState("");
-  const [toAmount, setToAmount] = useState("");
-  const [exchangeRate, setExchangeRate] = useState(4.3245);
-  const [isLive, setIsLive] = useState(true);
-  const [spread] = useState(0.02); // 2% spread
-  const [fee] = useState(0.005); // 0.5% prowizja
+  const [amount, setAmount] = useState("");
+  const [rate, setRate] = useState(4.3245);
+  const [fee, setFee] = useState(0.5);
+  
+  // Limit order state
+  const [limitPrice, setLimitPrice] = useState("");
+  const [orderType, setOrderType] = useState<"buy" | "sell">("buy");
+  const [expiryDate, setExpiryDate] = useState("");
+  
+  // Confirmation modal state
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [countdown, setCountdown] = useState(15);
+  const [isConfirmed, setIsConfirmed] = useState(false);
 
-  // Symulacja aktualizacji kursu co 1 sekundę
+  const currencies: Currency[] = [
+    { code: "PLN", name: "Złoty Polski", flag: "🇵🇱", rate: 1, available: 45230.50 },
+    { code: "EUR", name: "Euro", flag: "🇪🇺", rate: 4.3245, available: 12500.00 },
+    { code: "USD", name: "Dolar Amerykański", flag: "🇺🇸", rate: 3.9876, available: 8900.00 },
+    { code: "GBP", name: "Funt Brytyjski", flag: "🇬🇧", rate: 5.1234, available: 3200.00 },
+    { code: "CHF", name: "Frank Szwajcarski", flag: "🇨🇭", rate: 4.5000, available: 1500.00 },
+  ];
+
+  // Handle incoming navigation state
   useEffect(() => {
-    const interval = setInterval(() => {
-      setExchangeRate(prev => {
-        const change = (Math.random() - 0.5) * 0.01;
-        return Math.max(0.01, prev + change);
-      });
-      setIsLive(true);
-      setTimeout(() => setIsLive(false), 200);
-    }, 1000);
+    if (location.state) {
+      const { action, currency } = location.state;
+      if (action === 'buy') {
+        setToCurrency(currency);
+        setFromCurrency('PLN');
+      } else if (action === 'sell') {
+        setFromCurrency(currency);
+        setToCurrency('PLN');
+      } else if (action === 'exchange') {
+        setFromCurrency(currency);
+      }
+    }
+  }, [location.state]);
 
-    return () => clearInterval(interval);
+  // Update rate when currencies change
+  useEffect(() => {
+    const fromCurr = currencies.find(c => c.code === fromCurrency);
+    const toCurr = currencies.find(c => c.code === toCurrency);
+    if (fromCurr && toCurr) {
+      setRate(toCurr.rate / fromCurr.rate);
+    }
   }, [fromCurrency, toCurrency]);
 
-  // Przeliczanie kwot
+  // Countdown timer for confirmation
   useEffect(() => {
-    if (fromAmount && !isNaN(Number(fromAmount))) {
-      const rateWithSpread = exchangeRate * (1 - spread);
-      const calculatedAmount = Number(fromAmount) * rateWithSpread;
-      setToAmount(calculatedAmount.toFixed(2));
-    } else {
-      setToAmount("");
+    if (showConfirmation && countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (countdown === 0 && !isConfirmed) {
+      setShowConfirmation(false);
+      setCountdown(15);
     }
-  }, [fromAmount, exchangeRate, spread]);
-
-  const handleFromAmountChange = (value: string) => {
-    setFromAmount(value);
-  };
-
-  const handleToAmountChange = (value: string) => {
-    setToAmount(value);
-    if (value && !isNaN(Number(value))) {
-      const rateWithSpread = exchangeRate * (1 - spread);
-      const calculatedAmount = Number(value) / rateWithSpread;
-      setFromAmount(calculatedAmount.toFixed(2));
-    } else {
-      setFromAmount("");
-    }
-  };
-
-  const swapCurrencies = () => {
-    setFromCurrency(toCurrency);
-    setToCurrency(fromCurrency);
-    setFromAmount(toAmount);
-    setToAmount(fromAmount);
-  };
-
-  const handleExchange = () => {
-    if (!fromAmount || !toAmount) {
-      toast({
-        title: "Błąd",
-        description: "Proszę wprowadzić kwotę do wymiany",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const finalAmount = Number(toAmount) * (1 - fee);
-    
-    toast({
-      title: "Wymiana zakończona pomyślnie!",
-      description: `Wymieniono ${fromAmount} ${fromCurrency} na ${finalAmount.toFixed(2)} ${toCurrency}`,
-    });
-
-    // Reset formularza
-    setFromAmount("");
-    setToAmount("");
-  };
+  }, [showConfirmation, countdown, isConfirmed]);
 
   const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('pl-PL', {
@@ -109,170 +93,338 @@ export default function Exchange() {
     }).format(amount);
   };
 
+  const calculateResult = () => {
+    const numAmount = parseFloat(amount) || 0;
+    const feeAmount = (numAmount * fee) / 100;
+    const result = (numAmount - feeAmount) * rate;
+    return { result, feeAmount };
+  };
+
+  const handleExchange = () => {
+    setShowConfirmation(true);
+    setCountdown(15);
+    setIsConfirmed(false);
+  };
+
+  const handleConfirm = () => {
+    setIsConfirmed(true);
+    // Here you would typically make an API call
+    setTimeout(() => {
+      setShowConfirmation(false);
+      setCountdown(15);
+      setIsConfirmed(false);
+      navigate('/history');
+    }, 2000);
+  };
+
+  const { result, feeAmount } = calculateResult();
+  const isCountdownCritical = countdown <= 5;
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">Kalkulator Wymiany Walut</h1>
-        <p className="text-muted-foreground">
-          Wymień waluty po konkurencyjnych kursach w czasie rzeczywistym
-        </p>
+      <div className="flex items-center space-x-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate(-1)}
+          className="hover:bg-muted"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Button>
+        <div>
+          <h1 className="text-3xl font-bold">Wymiana Walut</h1>
+          <p className="text-muted-foreground">Szybka i bezpieczna wymiana</p>
+        </div>
       </div>
 
-      {/* Główny kalkulator */}
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <ArrowRightLeft className="w-5 h-5" />
-            <span>Wymiana Walut</span>
-            {isLive && (
-              <div className="flex items-center space-x-1 text-green-500">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm">LIVE</span>
+      {/* Exchange Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="market">Wymiana Natychmiastowa</TabsTrigger>
+          <TabsTrigger value="limit">Zlecenie z Limitem</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="market" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Wymiana Natychmiastowa</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* From Currency */}
+              <div className="space-y-2">
+                <Label>Masz</Label>
+                <div className="flex space-x-2">
+                  <Select value={fromCurrency} onValueChange={setFromCurrency}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {currencies.map((currency) => (
+                        <SelectItem key={currency.code} value={currency.code}>
+                          <div className="flex items-center space-x-2">
+                            <span>{currency.flag}</span>
+                            <span>{currency.code}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    type="number"
+                    placeholder="0.00"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="flex-1"
+                  />
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Dostępne: {formatCurrency(currencies.find(c => c.code === fromCurrency)?.available || 0, fromCurrency)}
+                </div>
               </div>
-            )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* From Currency */}
-          <div className="space-y-2">
-            <Label>Mam</Label>
-            <div className="flex space-x-2">
-              <Select value={fromCurrency} onValueChange={setFromCurrency}>
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {currencies.map((currency) => (
-                    <SelectItem key={currency.code} value={currency.code}>
-                      <div className="flex items-center space-x-2">
-                        <span>{currency.flag}</span>
-                        <span>{currency.code}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Input
-                type="number"
-                placeholder="0.00"
-                value={fromAmount}
-                onChange={(e) => handleFromAmountChange(e.target.value)}
-                className="flex-1"
-              />
-            </div>
-          </div>
 
-          {/* Swap button */}
-          <div className="flex justify-center">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={swapCurrencies}
-              className="rounded-full border-2 hover:bg-primary hover:text-primary-foreground"
-            >
-              <ArrowRightLeft className="w-4 h-4" />
-            </Button>
-          </div>
+              {/* Exchange Arrow */}
+              <div className="flex justify-center">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    setFromCurrency(toCurrency);
+                    setToCurrency(fromCurrency);
+                  }}
+                >
+                  <ArrowRightLeft className="w-4 h-4" />
+                </Button>
+              </div>
 
-          {/* To Currency */}
-          <div className="space-y-2">
-            <Label>Chcę otrzymać</Label>
-            <div className="flex space-x-2">
-              <Select value={toCurrency} onValueChange={setToCurrency}>
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {currencies.map((currency) => (
-                    <SelectItem key={currency.code} value={currency.code}>
-                      <div className="flex items-center space-x-2">
-                        <span>{currency.flag}</span>
-                        <span>{currency.code}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Input
-                type="number"
-                placeholder="0.00"
-                value={toAmount}
-                onChange={(e) => handleToAmountChange(e.target.value)}
-                className="flex-1"
-              />
-            </div>
-          </div>
+              {/* To Currency */}
+              <div className="space-y-2">
+                <Label>Otrzymasz</Label>
+                <div className="flex space-x-2">
+                  <Select value={toCurrency} onValueChange={setToCurrency}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {currencies.map((currency) => (
+                        <SelectItem key={currency.code} value={currency.code}>
+                          <div className="flex items-center space-x-2">
+                            <span>{currency.flag}</span>
+                            <span>{currency.code}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    type="number"
+                    placeholder="0.00"
+                    value={result.toFixed(2)}
+                    readOnly
+                    className="flex-1 bg-muted"
+                  />
+                </div>
+              </div>
 
-          {/* Rate info */}
-          <div className="p-4 bg-muted rounded-lg space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Kurs wymiany:</span>
-              <span className={`font-mono ${isLive ? 'animate-pulse-value' : ''}`}>
-                1 {fromCurrency} = {exchangeRate.toFixed(4)} {toCurrency}
-              </span>
+              {/* Exchange Details */}
+              <div className="space-y-2 p-4 bg-muted rounded-lg">
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Kurs wymiany:</span>
+                  <span className="font-mono">1 {fromCurrency} = {rate.toFixed(4)} {toCurrency}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Opłata:</span>
+                  <span className="text-sm">{formatCurrency(feeAmount, fromCurrency)} ({fee}%)</span>
+                </div>
+                <div className="flex justify-between font-medium">
+                  <span>Do otrzymania:</span>
+                  <span>{formatCurrency(result, toCurrency)}</span>
+                </div>
+              </div>
+
+              <Button 
+                className="w-full" 
+                size="lg"
+                onClick={handleExchange}
+                disabled={!amount || parseFloat(amount) <= 0}
+              >
+                Wymień teraz
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="limit" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Zlecenie z Limitem Ceny</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Order Type */}
+              <div className="space-y-2">
+                <Label>Typ zlecenia</Label>
+                <div className="flex space-x-2">
+                  <Button
+                    variant={orderType === "buy" ? "default" : "outline"}
+                    onClick={() => setOrderType("buy")}
+                    className="flex-1"
+                  >
+                    Kup
+                  </Button>
+                  <Button
+                    variant={orderType === "sell" ? "default" : "outline"}
+                    onClick={() => setOrderType("sell")}
+                    className="flex-1"
+                  >
+                    Sprzedaj
+                  </Button>
+                </div>
+              </div>
+
+              {/* Currency and Amount */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Waluta</Label>
+                  <Select value={fromCurrency} onValueChange={setFromCurrency}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {currencies.map((currency) => (
+                        <SelectItem key={currency.code} value={currency.code}>
+                          <div className="flex items-center space-x-2">
+                            <span>{currency.flag}</span>
+                            <span>{currency.code}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Ilość</Label>
+                  <Input
+                    type="number"
+                    placeholder="0.00"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Limit Price */}
+              <div className="space-y-2">
+                <Label>Cena limitu</Label>
+                <Input
+                  type="number"
+                  placeholder="0.0000"
+                  value={limitPrice}
+                  onChange={(e) => setLimitPrice(e.target.value)}
+                />
+              </div>
+
+              {/* Expiry Date */}
+              <div className="space-y-2">
+                <Label>Data ważności</Label>
+                <Input
+                  type="date"
+                  value={expiryDate}
+                  onChange={(e) => setExpiryDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+
+              <Button 
+                className="w-full" 
+                size="lg"
+                disabled={!amount || !limitPrice || !expiryDate}
+              >
+                <Clock className="w-4 h-4 mr-2" />
+                Utwórz zlecenie
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Confirmation Modal */}
+      <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Potwierdź wymianę</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="p-4 bg-muted rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-medium">Wymieniasz:</span>
+                <span>{formatCurrency(parseFloat(amount) || 0, fromCurrency)}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Otrzymasz:</span>
+                <span>{formatCurrency(result, toCurrency)}</span>
+              </div>
             </div>
-            <div className="flex justify-between text-sm">
-              <span>Spread:</span>
-              <span>{(spread * 100).toFixed(1)}%</span>
+
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Kurs:</span>
+                <span className="font-mono">1 {fromCurrency} = {rate.toFixed(4)} {toCurrency}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span>Opłata:</span>
+                <span>{formatCurrency(feeAmount, fromCurrency)}</span>
+              </div>
             </div>
-            <div className="flex justify-between text-sm">
-              <span>Prowizja:</span>
-              <span>{(fee * 100).toFixed(1)}%</span>
-            </div>
-            {fromAmount && toAmount && (
-              <div className="flex justify-between text-sm font-semibold pt-2 border-t border-border">
-                <span>Otrzymasz:</span>
-                <span>
-                  {formatCurrency(Number(toAmount) * (1 - fee), toCurrency)}
+
+            {/* Countdown Progress */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Czas na anulowanie:</span>
+                <span className={isCountdownCritical ? "text-red-500 font-medium" : ""}>
+                  {countdown}s
                 </span>
               </div>
-            )}
+              <Progress 
+                value={(countdown / 15) * 100} 
+                className={isCountdownCritical ? "bg-red-100" : ""}
+              />
+            </div>
+
+            <div className="flex space-x-2">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  setShowConfirmation(false);
+                  setCountdown(15);
+                }}
+                disabled={isConfirmed}
+              >
+                <X className="w-4 h-4 mr-2" />
+                Anuluj
+              </Button>
+              <Button
+                className={`flex-1 ${isCountdownCritical ? "bg-red-500 hover:bg-red-600" : ""}`}
+                onClick={handleConfirm}
+                disabled={countdown > 13 || isConfirmed}
+              >
+                {isConfirmed ? (
+                  <>
+                    <Check className="w-4 h-4 mr-2" />
+                    Potwierdzono
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4 mr-2" />
+                    Potwierdź
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
-
-          {/* Exchange button */}
-          <Button 
-            className="w-full accent-button" 
-            size="lg"
-            onClick={handleExchange}
-            disabled={!fromAmount || !toAmount}
-          >
-            <Zap className="w-4 h-4 mr-2" />
-            Wymień teraz
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Dodatkowe informacje */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <TrendingUp className="w-8 h-8 mx-auto mb-2 text-green-500" />
-            <h3 className="font-semibold">Konkurencyjne kursy</h3>
-            <p className="text-sm text-muted-foreground">
-              Najlepsze kursy na rynku
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Zap className="w-8 h-8 mx-auto mb-2 text-blue-500" />
-            <h3 className="font-semibold">Błyskawiczne transakcje</h3>
-            <p className="text-sm text-muted-foreground">
-              Wymiana w czasie rzeczywistym
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <ArrowRightLeft className="w-8 h-8 mx-auto mb-2 text-purple-500" />
-            <h3 className="font-semibold">Bez ukrytych opłat</h3>
-            <p className="text-sm text-muted-foreground">
-              Transparentne ceny
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

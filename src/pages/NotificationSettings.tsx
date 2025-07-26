@@ -1,143 +1,351 @@
-import { ArrowLeft, Mail, MessageSquare, Smartphone, Volume2 } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Bell, Mail, Smartphone, Clock, Shield, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+
+interface NotificationSetting {
+  id: string;
+  title: string;
+  description: string;
+  email: boolean;
+  sms: boolean;
+  push: boolean;
+  icon: any;
+}
+
+interface NotificationSchedule {
+  id: string;
+  title: string;
+  time: string;
+  enabled: boolean;
+}
 
 export default function NotificationSettings() {
   const navigate = useNavigate();
+  const [emailFrequency, setEmailFrequency] = useState("daily");
+  const [quietHours, setQuietHours] = useState("22:00-08:00");
+
+  const [notificationSettings, setNotificationSettings] = useState<NotificationSetting[]>([
+    {
+      id: "price-alerts",
+      title: "Alerty cenowe",
+      description: "Powiadomienia o zmianach kursów walut",
+      email: true,
+      sms: false,
+      push: true,
+      icon: Bell
+    },
+    {
+      id: "transaction-confirmations",
+      title: "Potwierdzenia transakcji",
+      description: "Powiadomienia o wykonanych operacjach",
+      email: true,
+      sms: true,
+      push: true,
+      icon: Zap
+    },
+    {
+      id: "security-alerts",
+      title: "Alerty bezpieczeństwa",
+      description: "Powiadomienia o logowaniach i zmianach konta",
+      email: true,
+      sms: true,
+      push: false,
+      icon: Shield
+    },
+    {
+      id: "market-updates",
+      title: "Aktualności rynkowe",
+      description: "Wiadomości ze świata walut i ekonomii",
+      email: false,
+      sms: false,
+      push: true,
+      icon: Bell
+    },
+    {
+      id: "account-updates",
+      title: "Aktualizacje konta",
+      description: "Informacje o zmianach w ustawieniach",
+      email: true,
+      sms: false,
+      push: false,
+      icon: Mail
+    },
+    {
+      id: "promotional",
+      title: "Oferty promocyjne",
+      description: "Specjalne oferty i promocje",
+      email: false,
+      sms: false,
+      push: false,
+      icon: Zap
+    }
+  ]);
+
+  const [schedules] = useState<NotificationSchedule[]>([
+    {
+      id: "daily-summary",
+      title: "Dzienny raport",
+      time: "18:00",
+      enabled: true
+    },
+    {
+      id: "weekly-summary",
+      title: "Tygodniowy raport",
+      time: "09:00",
+      enabled: true
+    },
+    {
+      id: "monthly-summary",
+      title: "Miesięczny raport",
+      time: "10:00",
+      enabled: false
+    }
+  ]);
+
+  const handleToggleNotification = (settingId: string, channel: "email" | "sms" | "push") => {
+    setNotificationSettings(prev => prev.map(setting => 
+      setting.id === settingId 
+        ? { ...setting, [channel]: !setting[channel] }
+        : setting
+    ));
+  };
+
+  const getChannelIcon = (channel: string) => {
+    switch (channel) {
+      case "email":
+        return <Mail className="w-4 h-4" />;
+      case "sms":
+        return <Smartphone className="w-4 h-4" />;
+      case "push":
+        return <Bell className="w-4 h-4" />;
+      default:
+        return <Bell className="w-4 h-4" />;
+    }
+  };
+
+  const getChannelColor = (channel: string) => {
+    switch (channel) {
+      case "email":
+        return "text-blue-600";
+      case "sms":
+        return "text-green-600";
+      case "push":
+        return "text-purple-600";
+      default:
+        return "text-gray-600";
+    }
+  };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center space-x-4">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           size="icon"
           onClick={() => navigate(-1)}
-          className="rounded-full"
+          className="hover:bg-muted"
         >
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div>
           <h1 className="text-3xl font-bold">Ustawienia Powiadomień</h1>
-          <p className="text-muted-foreground">Zarządzaj sposobem otrzymywania powiadomień</p>
+          <p className="text-muted-foreground">Zarządzaj powiadomieniami email, SMS i push</p>
         </div>
       </div>
 
-      {/* Email Notifications */}
-      <Card className="widget-card">
+      {/* General Settings */}
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Mail className="w-5 h-5 text-primary" />
-            <span>Powiadomienia Email</span>
-          </CardTitle>
+          <CardTitle>Ogólne ustawienia</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="email-alerts">Alerty cenowe</Label>
-              <p className="text-sm text-muted-foreground">Otrzymuj email gdy kurs osiągnie zadaną wartość</p>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label>Częstotliwość email</Label>
+              <Select value={emailFrequency} onValueChange={setEmailFrequency}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="immediate">Natychmiast</SelectItem>
+                  <SelectItem value="hourly">Co godzinę</SelectItem>
+                  <SelectItem value="daily">Dziennie</SelectItem>
+                  <SelectItem value="weekly">Tygodniowo</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Switch id="email-alerts" defaultChecked />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="email-transactions">Potwierdzenia transakcji</Label>
-              <p className="text-sm text-muted-foreground">Email po każdej wykonanej wymianie</p>
+            
+            <div className="space-y-2">
+              <Label>Ciche godziny</Label>
+              <Select value={quietHours} onValueChange={setQuietHours}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="22:00-08:00">22:00 - 08:00</SelectItem>
+                  <SelectItem value="23:00-07:00">23:00 - 07:00</SelectItem>
+                  <SelectItem value="00:00-06:00">00:00 - 06:00</SelectItem>
+                  <SelectItem value="disabled">Wyłączone</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Switch id="email-transactions" defaultChecked />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="email-summary">Podsumowanie tygodniowe</Label>
-              <p className="text-sm text-muted-foreground">Raport z działalności i wyników</p>
-            </div>
-            <Switch id="email-summary" defaultChecked />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="email-frequency">Częstotliwość emaili</Label>
-              <p className="text-sm text-muted-foreground">Jak często otrzymywać powiadomienia</p>
-            </div>
-            <Select defaultValue="realtime">
-              <SelectTrigger className="w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="realtime">Natychmiast</SelectItem>
-                <SelectItem value="hourly">Co godzinę</SelectItem>
-                <SelectItem value="daily">Raz dziennie</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </CardContent>
       </Card>
 
-      {/* Push Notifications */}
-      <Card className="widget-card">
+      {/* Notification Types */}
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Smartphone className="w-5 h-5 text-primary" />
-            <span>Powiadomienia Push</span>
-          </CardTitle>
+          <CardTitle>Typy powiadomień</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="push-alerts">Alerty cenowe</Label>
-              <p className="text-sm text-muted-foreground">Powiadomienia push w przeglądarce</p>
-            </div>
-            <Switch id="push-alerts" defaultChecked />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="push-news">Ważne wiadomości rynkowe</Label>
-              <p className="text-sm text-muted-foreground">Powiadomienia o wydarzeniach wpływających na kursy</p>
-            </div>
-            <Switch id="push-news" />
+        <CardContent>
+          <div className="space-y-6">
+            {notificationSettings.map((setting) => (
+              <div key={setting.id} className="space-y-4">
+                <div className="flex items-start space-x-4">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <setting.icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium">{setting.title}</h3>
+                        <p className="text-sm text-muted-foreground">{setting.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 ml-14">
+                  {(["email", "sms", "push"] as const).map((channel) => (
+                    <div key={channel} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-2">
+                        <div className={getChannelColor(channel)}>
+                          {getChannelIcon(channel)}
+                        </div>
+                        <span className="text-sm font-medium capitalize">{channel}</span>
+                      </div>
+                      <Switch
+                        checked={setting[channel]}
+                        onCheckedChange={() => handleToggleNotification(setting.id, channel)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Sound Settings */}
-      <Card className="widget-card">
+      {/* Scheduled Reports */}
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Volume2 className="w-5 h-5 text-primary" />
-            <span>Ustawienia Dźwięku</span>
-          </CardTitle>
+          <CardTitle>Raporty zaplanowane</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="sound-alerts">Dźwięki alertów</Label>
-              <p className="text-sm text-muted-foreground">Odtwarzaj dźwięk przy alertach cenowych</p>
-            </div>
-            <Switch id="sound-alerts" defaultChecked />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="sound-transactions">Dźwięki transakcji</Label>
-              <p className="text-sm text-muted-foreground">Dźwięk potwierdzenia przy wymianach</p>
-            </div>
-            <Switch id="sound-transactions" />
+        <CardContent>
+          <div className="space-y-4">
+            {schedules.map((schedule) => (
+              <div key={schedule.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center space-x-4">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Clock className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <div className="font-medium">{schedule.title}</div>
+                    <div className="text-sm text-muted-foreground">
+                      Codziennie o {schedule.time}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Badge variant={schedule.enabled ? "default" : "secondary"}>
+                    {schedule.enabled ? "Aktywny" : "Nieaktywny"}
+                  </Badge>
+                  <Switch checked={schedule.enabled} />
+                </div>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Save Button */}
-      <div className="flex justify-end">
-        <Button className="loombard-button-primary">
-          Zapisz ustawienia
-        </Button>
+      {/* Notification Channels Status */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Status kanałów</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-4 border rounded-lg">
+              <div className="flex items-center space-x-2 mb-2">
+                <Mail className="w-5 h-5 text-blue-600" />
+                <span className="font-medium">Email</span>
+                <Badge variant="default" className="text-xs">Aktywny</Badge>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                jan.kowalski@example.com
+              </p>
+            </div>
+            
+            <div className="p-4 border rounded-lg">
+              <div className="flex items-center space-x-2 mb-2">
+                <Smartphone className="w-5 h-5 text-green-600" />
+                <span className="font-medium">SMS</span>
+                <Badge variant="secondary" className="text-xs">Nieaktywny</Badge>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                +48 123 456 789
+              </p>
+            </div>
+            
+            <div className="p-4 border rounded-lg">
+              <div className="flex items-center space-x-2 mb-2">
+                <Bell className="w-5 h-5 text-purple-600" />
+                <span className="font-medium">Push</span>
+                <Badge variant="default" className="text-xs">Aktywny</Badge>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Przeglądarka
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-2xl font-bold text-blue-600">24</div>
+            <div className="text-sm text-muted-foreground">Email dzisiaj</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-2xl font-bold text-green-600">3</div>
+            <div className="text-sm text-muted-foreground">SMS dzisiaj</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-2xl font-bold text-purple-600">12</div>
+            <div className="text-sm text-muted-foreground">Push dzisiaj</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-2xl font-bold">8</div>
+            <div className="text-sm text-muted-foreground">Aktywne alerty</div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

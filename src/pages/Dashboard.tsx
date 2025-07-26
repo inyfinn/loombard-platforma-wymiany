@@ -1,19 +1,88 @@
 import { useState, useEffect } from "react";
-import { ArrowUpRight, ArrowDownRight, TrendingUp, Plus, History, ArrowRightLeft } from "lucide-react";
+import { 
+  ArrowUpRight, 
+  ArrowDownRight, 
+  TrendingUp, 
+  Plus, 
+  History, 
+  ArrowRightLeft,
+  Edit3,
+  Save,
+  X,
+  Calculator,
+  AlertTriangle,
+  BarChart3,
+  Target,
+  TrendingDown,
+  DollarSign,
+  Clock,
+  Bell,
+  Activity,
+  PieChart,
+  Settings,
+  Eye,
+  Brain,
+  Trophy,
+  Mail,
+  Star,
+  Zap,
+  ChevronLeft
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { useNavigate } from "react-router-dom";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+
+interface Widget {
+  id: string;
+  type: string;
+  title: string;
+  size: "small" | "medium" | "large";
+  position: number;
+  visible: boolean;
+}
+
+interface Balance {
+  currency: string;
+  amount: number;
+  code: string;
+  value: number;
+}
+
+interface Transaction {
+  id: number;
+  type: "exchange" | "deposit" | "withdrawal";
+  from: string;
+  to: string;
+  amount: number;
+  rate: number;
+  date: string;
+  profit?: number;
+}
+
+interface Rate {
+  pair: string;
+  rate: number;
+  change: number;
+  volume: number;
+}
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [editMode, setEditMode] = useState(false);
   const [totalBalance, setTotalBalance] = useState(125430.50);
-  const [balances] = useState([
-    { currency: "PLN", amount: 45230.50, code: "PLN" },
-    { currency: "EUR", amount: 12500.00, code: "EUR" },
-    { currency: "USD", amount: 8900.00, code: "USD" },
+  const [baseCurrency, setBaseCurrency] = useState("PLN");
+  
+  const [balances] = useState<Balance[]>([
+    { currency: "PLN", amount: 45230.50, code: "PLN", value: 45230.50 },
+    { currency: "EUR", amount: 12500.00, code: "EUR", value: 54050.00 },
+    { currency: "USD", amount: 8900.00, code: "USD", value: 35490.00 },
+    { currency: "GBP", amount: 3200.00, code: "GBP", value: 16396.80 },
   ]);
 
-  const [recentTransactions] = useState([
+  const [recentTransactions] = useState<Transaction[]>([
     {
       id: 1,
       type: "exchange",
@@ -22,6 +91,7 @@ export default function Dashboard() {
       amount: 1000,
       rate: 4.32,
       date: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      profit: 120
     },
     {
       id: 2,
@@ -32,19 +102,46 @@ export default function Dashboard() {
       rate: 1,
       date: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
     },
+    {
+      id: 3,
+      type: "exchange",
+      from: "USD",
+      to: "EUR",
+      amount: 2000,
+      rate: 0.85,
+      date: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
+      profit: -45
+    },
   ]);
 
-  const [currentRates] = useState([
-    { pair: "EUR/PLN", rate: 4.3245, change: 0.12 },
-    { pair: "USD/PLN", rate: 3.9876, change: -0.08 },
-    { pair: "GBP/PLN", rate: 5.1234, change: 0.25 },
+  const [currentRates] = useState<Rate[]>([
+    { pair: "EUR/PLN", rate: 4.3245, change: 0.12, volume: 1250000 },
+    { pair: "USD/PLN", rate: 3.9876, change: -0.08, volume: 890000 },
+    { pair: "GBP/PLN", rate: 5.1234, change: 0.25, volume: 450000 },
+    { pair: "EUR/USD", rate: 1.0845, change: 0.05, volume: 2100000 },
   ]);
 
-  // Animacja licznika dla salda
+  const [priceAlerts] = useState([
+    { id: 1, pair: "EUR/PLN", condition: "above", value: 4.35, active: true },
+    { id: 2, pair: "USD/PLN", condition: "below", value: 3.95, active: false },
+  ]);
+
+  const [widgets, setWidgets] = useState<Widget[]>([
+    { id: "total-balance", type: "total-balance", title: "Całkowite Saldo", size: "large", position: 0, visible: true },
+    { id: "quick-actions", type: "quick-actions", title: "Szybkie Akcje", size: "small", position: 1, visible: true },
+    { id: "top-currencies", type: "top-currencies", title: "Top 3 Waluty", size: "medium", position: 2, visible: true },
+    { id: "live-rates", type: "live-rates", title: "Kursy LIVE", size: "medium", position: 3, visible: true },
+    { id: "price-alerts", type: "price-alerts", title: "Alerty Cenowe", size: "small", position: 4, visible: true },
+    { id: "recent-transactions", type: "recent-transactions", title: "Ostatnie Transakcje", size: "medium", position: 5, visible: true },
+    { id: "ai-prediction", type: "ai-prediction", title: "AI Doradza", size: "small", position: 6, visible: true },
+    { id: "portfolio-chart", type: "portfolio-chart", title: "Wykres Portfela", size: "large", position: 7, visible: true },
+  ]);
+
+  // Aktualizacja w czasie rzeczywistym co 1 sekundę
   useEffect(() => {
     const interval = setInterval(() => {
-      setTotalBalance(prev => prev + (Math.random() - 0.5) * 10);
-    }, 5000);
+      setTotalBalance(prev => prev + (Math.random() - 0.5) * 5);
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -65,6 +162,320 @@ export default function Dashboard() {
     });
   };
 
+  const handleDragEnd = (result: any) => {
+    if (!result.destination) return;
+
+    const items = Array.from(widgets);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    const updatedWidgets = items.map((item, index) => ({
+      ...item,
+      position: index
+    }));
+
+    setWidgets(updatedWidgets);
+  };
+
+  const toggleWidgetVisibility = (widgetId: string) => {
+    setWidgets(prev => prev.map(widget => 
+      widget.id === widgetId ? { ...widget, visible: !widget.visible } : widget
+    ));
+  };
+
+  const renderWidget = (widget: Widget) => {
+    if (!widget.visible) return null;
+
+    switch (widget.type) {
+      case "total-balance":
+        return (
+          <Card key={widget.id} className="col-span-1 md:col-span-2 lg:col-span-2">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-lg font-medium">Całkowite Saldo</CardTitle>
+              {editMode && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => toggleWidgetVisibility(widget.id)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="text-3xl font-bold animate-pulse-value">
+                  {formatCurrency(totalBalance, baseCurrency)}
+                </div>
+                <div className="flex items-center text-sm text-green-500">
+                  <ArrowUpRight className="w-4 h-4 mr-1" />
+                  +2.4% od wczoraj
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+
+      case "quick-actions":
+        return (
+          <Card key={widget.id} className="col-span-1">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-lg font-medium">Szybkie Akcje</CardTitle>
+              {editMode && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => toggleWidgetVisibility(widget.id)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button className="w-full" onClick={() => navigate('/exchange')}>
+                <ArrowRightLeft className="w-4 h-4 mr-2" />
+                Wymień
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => navigate('/portfel')}>
+                <DollarSign className="w-4 h-4 mr-2" />
+                Portfel
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => navigate('/rates')}>
+                <TrendingUp className="w-4 h-4 mr-2" />
+                Kursy
+              </Button>
+            </CardContent>
+          </Card>
+        );
+
+      case "top-currencies":
+        return (
+          <Card key={widget.id} className="col-span-1 md:col-span-2">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-lg font-medium">Top 3 Waluty</CardTitle>
+              {editMode && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => toggleWidgetVisibility(widget.id)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {balances.slice(0, 3).map((balance) => (
+                  <div key={balance.code} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                        <span className="text-sm font-bold">{balance.code}</span>
+                      </div>
+                      <div>
+                        <div className="font-medium">{balance.currency}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {formatCurrency(balance.amount, balance.code)}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-medium">
+                        {formatCurrency(balance.value, baseCurrency)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        );
+
+      case "live-rates":
+        return (
+          <Card key={widget.id} className="col-span-1 md:col-span-2">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-lg font-medium">Kursy LIVE</CardTitle>
+              {editMode && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => toggleWidgetVisibility(widget.id)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {currentRates.map((rate) => (
+                  <div key={rate.pair} className="flex items-center justify-between">
+                    <div className="font-medium">{rate.pair}</div>
+                    <div className="flex items-center space-x-2">
+                      <span className="font-mono">{rate.rate.toFixed(4)}</span>
+                      <Badge variant={rate.change >= 0 ? "default" : "destructive"}>
+                        {rate.change >= 0 ? "+" : ""}{rate.change.toFixed(2)}%
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        );
+
+      case "price-alerts":
+        return (
+          <Card key={widget.id} className="col-span-1">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-lg font-medium">Alerty Cenowe</CardTitle>
+              {editMode && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => toggleWidgetVisibility(widget.id)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {priceAlerts.map((alert) => (
+                  <div key={alert.id} className="flex items-center justify-between p-2 bg-muted rounded">
+                    <div className="text-sm">
+                      <div className="font-medium">{alert.pair}</div>
+                      <div className="text-muted-foreground">
+                        {alert.condition === "above" ? ">" : "<"} {alert.value}
+                      </div>
+                    </div>
+                    <Switch checked={alert.active} />
+                  </div>
+                ))}
+                <Button variant="outline" size="sm" className="w-full mt-2">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Dodaj alert
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        );
+
+      case "recent-transactions":
+        return (
+          <Card key={widget.id} className="col-span-1 md:col-span-2">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-lg font-medium">Ostatnie Transakcje</CardTitle>
+              {editMode && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => toggleWidgetVisibility(widget.id)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {recentTransactions.map((transaction) => (
+                  <div key={transaction.id} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                        {transaction.type === "exchange" ? (
+                          <ArrowRightLeft className="w-4 h-4" />
+                        ) : (
+                          <DollarSign className="w-4 h-4" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-medium">
+                          {transaction.from} → {transaction.to}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {formatTime(transaction.date)}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-medium">
+                        {formatCurrency(transaction.amount, transaction.from)}
+                      </div>
+                      {transaction.profit && (
+                        <div className={`text-sm ${transaction.profit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                          {transaction.profit >= 0 ? '+' : ''}{formatCurrency(transaction.profit, baseCurrency)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        );
+
+      case "ai-prediction":
+        return (
+          <Card key={widget.id} className="col-span-1">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-lg font-medium">AI Doradza</CardTitle>
+              {editMode && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => toggleWidgetVisibility(widget.id)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <Brain className="w-5 h-5 text-primary" />
+                  <span className="text-sm font-medium">EUR/PLN</span>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Wzrost o 0.8% w ciągu 24h. Zalecam sprzedaż części pozycji.
+                </div>
+                <Button size="sm" className="w-full">
+                  Zobacz szczegóły
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        );
+
+      case "portfolio-chart":
+        return (
+          <Card key={widget.id} className="col-span-1 md:col-span-2 lg:col-span-2">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-lg font-medium">Wykres Portfela</CardTitle>
+              {editMode && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => toggleWidgetVisibility(widget.id)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent>
+              <div className="h-64 bg-muted rounded-lg flex items-center justify-center">
+                <div className="text-center">
+                  <BarChart3 className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-muted-foreground">Wykres portfela</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -73,159 +484,100 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">Witaj ponownie! Oto podsumowanie Twojego konta.</p>
         </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant={editMode ? "default" : "outline"}
+            onClick={() => setEditMode(!editMode)}
+          >
+            {editMode ? (
+              <>
+                <Save className="w-4 h-4 mr-2" />
+                Zapisz układ
+              </>
+            ) : (
+              <>
+                <Edit3 className="w-4 h-4 mr-2" />
+                Edytuj układ
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
-      {/* Główne karty sald */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Całkowite saldo */}
-        <Card className="col-span-1 md:col-span-2 lg:col-span-2">
+      {/* Widgets Grid */}
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="dashboard" direction="horizontal">
+          {(provided) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            >
+              {widgets
+                .filter(widget => widget.visible)
+                .sort((a, b) => a.position - b.position)
+                .map((widget, index) => (
+                  <Draggable
+                    key={widget.id}
+                    draggableId={widget.id}
+                    index={index}
+                    isDragDisabled={!editMode}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        {renderWidget(widget)}
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+
+      {/* Widget Library (visible only in edit mode) */}
+      {editMode && (
+        <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-medium">Całkowite Saldo</CardTitle>
+            <CardTitle>Dodaj widget</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              <div className="text-3xl font-bold animate-pulse-value">
-                {formatCurrency(totalBalance, 'PLN')}
-              </div>
-              <div className="flex items-center text-sm text-green-500">
-                <ArrowUpRight className="w-4 h-4 mr-1" />
-                +2.4% od wczoraj
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Szybkie akcje */}
-        <Card className="col-span-1">
-          <CardContent className="p-6">
-            <Button 
-              className="w-full accent-button"
-              onClick={() => navigate('/exchange')}
-            >
-              <ArrowRightLeft className="w-4 h-4 mr-2" />
-              Wymień walutę
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="col-span-1">
-          <CardContent className="p-6 space-y-3">
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={() => navigate('/history')}
-            >
-              <History className="w-4 h-4 mr-2" />
-              Historia
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Salda walut */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {balances.map((balance) => (
-          <Card key={balance.code} className="currency-card">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm opacity-90">{balance.currency}</p>
-                  <p className="text-2xl font-bold">
-                    {formatCurrency(balance.amount, balance.code)}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                    <span className="text-lg font-bold">{balance.code}</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Sekcja dolna - kursy i transakcje */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Aktualne kursy */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Kursy LIVE</CardTitle>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => navigate('/rates')}
-            >
-              Zobacz wszystkie
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {currentRates.map((rate) => (
-                <div key={rate.pair} className="flex items-center justify-between">
-                  <span className="font-medium">{rate.pair}</span>
-                  <div className="text-right">
-                    <div className="font-mono">{rate.rate.toFixed(4)}</div>
-                    <div className={`text-sm flex items-center ${
-                      rate.change > 0 ? 'text-green-500' : 'text-red-500'
-                    }`}>
-                      {rate.change > 0 ? (
-                        <ArrowUpRight className="w-3 h-3 mr-1" />
-                      ) : (
-                        <ArrowDownRight className="w-3 h-3 mr-1" />
-                      )}
-                      {Math.abs(rate.change).toFixed(2)}%
-                    </div>
-                  </div>
-                </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { id: "calculator", title: "Kalkulator", icon: Calculator },
+                { id: "notifications", title: "Powiadomienia", icon: Bell },
+                { id: "activity", title: "Aktywność", icon: Activity },
+                { id: "trophy", title: "Osiągnięcia", icon: Trophy },
+              ].map((widget) => (
+                <Button
+                  key={widget.id}
+                  variant="outline"
+                  className="h-20 flex flex-col items-center justify-center"
+                  onClick={() => {
+                    const newWidget: Widget = {
+                      id: `${widget.id}-${Date.now()}`,
+                      type: widget.id,
+                      title: widget.title,
+                      size: "small",
+                      position: widgets.length,
+                      visible: true
+                    };
+                    setWidgets([...widgets, newWidget]);
+                  }}
+                >
+                  <widget.icon className="w-6 h-6 mb-2" />
+                  <span className="text-sm">{widget.title}</span>
+                </Button>
               ))}
             </div>
           </CardContent>
         </Card>
-
-        {/* Ostatnie transakcje */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Ostatnie Transakcje</CardTitle>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => navigate('/history')}
-            >
-              Zobacz wszystkie
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentTransactions.map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                      <ArrowRightLeft className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="font-medium">
-                        {transaction.from} → {transaction.to}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {formatTime(transaction.date)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-mono">
-                      {formatCurrency(transaction.amount, transaction.to)}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Kurs: {transaction.rate.toFixed(4)}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      )}
     </div>
   );
 }
