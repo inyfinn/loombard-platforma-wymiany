@@ -571,9 +571,6 @@ export default function Dashboard() {
         <div>
           <h1 className="text-3xl font-bold">Cześć, {getPolishVocative(userName)}</h1>
           <p className="text-muted-foreground">Witaj ponownie! Oto podsumowanie Twojego konta.</p>
-          <div className="text-xs text-muted-foreground mt-1">
-            Demo: {exampleNames.map(name => `${name} → ${getPolishVocative(name)}`).join(', ')}
-          </div>
         </div>
         <div className="flex items-center space-x-2">
           <Button
