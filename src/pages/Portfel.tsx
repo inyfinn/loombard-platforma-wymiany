@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 interface Balance {
   code: string;
   amount: number;
+  change24h?: number;
 }
 
 export default function Portfel() {
@@ -114,7 +115,7 @@ export default function Portfel() {
                     {showValues ? formatCurrency(balance.amount, balance.code) : '••••••••'}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {showValues ? formatCurrency(balance.value, baseCurrency) : '••••••••'}
+                    {showValues ? formatCurrency(balance.amount, baseCurrency) : '••••••••'}
                   </div>
                   {balance.change24h !== 0 && (
                     <Badge 
