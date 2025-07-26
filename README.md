@@ -1,73 +1,77 @@
-# Welcome to your Lovable project
+# Loombard - Platforma Wymiany Walut
 
-## Project info
+Platforma do wymiany walut z nowoczesnym interfejsem użytkownika.
 
-**URL**: https://lovable.dev/projects/b6445cbf-a91c-4327-af8e-6d72716d17f4
+## 🚀 Deployment
 
-## How can I edit this code?
+### Opcja 1: Vercel (Zalecane)
 
-There are several ways of editing your application.
+1. **Przygotuj repozytorium GitHub:**
+   - Wypchnij kod do repozytorium GitHub
+   - Upewnij się, że branch główny to `main` lub `master`
 
-**Use Lovable**
+2. **Dodaj sekrety do GitHub:**
+   - Przejdź do Settings > Secrets and variables > Actions
+   - Dodaj następujące sekrety:
+     - `VERCEL_TOKEN` - token z Vercel CLI
+     - `VERCEL_ORG_ID` - ID organizacji Vercel
+     - `VERCEL_PROJECT_ID` - ID projektu Vercel
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b6445cbf-a91c-4327-af8e-6d72716d17f4) and start prompting.
+3. **Automatyczny deployment:**
+   - Każdy push do branch głównego automatycznie wdroży aplikację
+   - Pull requesty będą tworzyć preview deployments
 
-Changes made via Lovable will be committed automatically to this repo.
+### Opcja 2: Netlify
 
-**Use your preferred IDE**
+1. **Połącz z Netlify:**
+   - Przejdź do [netlify.com](https://netlify.com)
+   - Wybierz "New site from Git"
+   - Połącz z repozytorium GitHub
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. **Konfiguracja build:**
+   - Build command: `npm run build`
+   - Publish directory: `dist`
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Opcja 3: GitHub Pages
 
-Follow these steps:
+1. **Dodaj sekret:**
+   - `GH_TOKEN` - Personal Access Token z uprawnieniami do repo
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+2. **Workflow zostanie automatycznie uruchomiony**
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 🔧 Konfiguracja lokalna
 
-# Step 3: Install the necessary dependencies.
-npm i
+```bash
+# Instalacja zależności
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Uruchomienie w trybie deweloperskim
 npm run dev
+
+# Build produkcyjny
+npm run build
+
+# Preview build
+npm run preview
 ```
 
-**Edit a file directly in GitHub**
+## 📁 Struktura projektu
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```
+src/
+├── components/     # Komponenty UI
+├── pages/         # Strony aplikacji
+├── hooks/         # Custom hooks
+├── lib/           # Utility functions
+└── App.tsx        # Główny komponent
+```
 
-**Use GitHub Codespaces**
+## 🛠 Technologie
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
+- React 18
 - TypeScript
-- React
-- shadcn-ui
+- Vite
 - Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/b6445cbf-a91c-4327-af8e-6d72716d17f4) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- Shadcn/ui
+- React Router
+- React Query
