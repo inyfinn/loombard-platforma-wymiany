@@ -255,14 +255,16 @@ export default function Dashboard() {
       const updated = prev.map(w => w.id === widgetId ? { ...w, visible: false } : w);
       const removed = prev.find(w => w.id === widgetId);
       if (removed) {
-        toast({
+        const t = toast({
           description: `${removed.title} został ukryty`,
-          action: {
-            label: "Cofnij",
-            onClick: () => {
+          action: (
+            <ToastAction altText="Cofnij" onClick={() => {
               setWidgets(p => p.map(w => w.id === widgetId ? { ...w, visible: true } : w));
-            }
-          }
+              t.dismiss();
+            }}>
+              Cofnij
+            </ToastAction>
+          ),
         });
       }
       return updated;
