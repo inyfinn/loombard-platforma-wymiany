@@ -33,7 +33,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { useNavigate } from "react-router-dom";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { getPolishVocative } from "@/lib/utils";
 
 interface Widget {
@@ -167,12 +166,10 @@ export default function Dashboard() {
     });
   };
 
-  const handleDragEnd = (result: any) => {
-    if (!result.destination) return;
-
+  const handleWidgetReorder = (fromIndex: number, toIndex: number) => {
     const items = Array.from(widgets);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
+    const [reorderedItem] = items.splice(fromIndex, 1);
+    items.splice(toIndex, 0, reorderedItem);
 
     const updatedWidgets = items.map((item, index) => ({
       ...item,
@@ -513,40 +510,16 @@ export default function Dashboard() {
       </div>
 
       {/* Widgets Grid */}
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="dashboard" direction="horizontal">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-            >
-              {widgets
-                .filter(widget => widget.visible)
-                .sort((a, b) => a.position - b.position)
-                .map((widget, index) => (
-                  <Draggable
-                    key={widget.id}
-                    draggableId={widget.id}
-                    index={index}
-                    isDragDisabled={!editMode}
-                  >
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        {renderWidget(widget)}
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-              {provided.placeholder}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {widgets
+          .filter(widget => widget.visible)
+          .sort((a, b) => a.position - b.position)
+          .map((widget, index) => (
+            <div key={widget.id}>
+              {renderWidget(widget)}
             </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+          ))}
+      </div>
 
       {/* Widget Library (visible only in edit mode) */}
       {editMode && (
