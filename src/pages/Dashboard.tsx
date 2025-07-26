@@ -578,12 +578,12 @@ export default function Dashboard() {
                 setOriginalWidgets(widgets);
                 setEditMode(true);
               } else {
-                const id = toast({
+                const t = toast({
                   description: "Zapisać zmiany w układzie?",
                   action: (
                     <ToastAction altText="Zapisz" onClick={() => {
                       setEditMode(false);
-                      toast.dismiss(id);
+                      t.dismiss();
                     }}>
                       Tak, zapisz
                     </ToastAction>
@@ -608,13 +608,13 @@ export default function Dashboard() {
             <Button
               variant="outline"
               onClick={() => {
-                const id = toast({
+                const t = toast({
                   description: "Anulować wszystkie zmiany układu?",
                   action: (
                     <ToastAction altText="Anuluj" onClick={() => {
                       if (originalWidgets) setWidgets(originalWidgets);
                       setEditMode(false);
-                      toast.dismiss(id);
+                      t.dismiss();
                     }}>
                       Tak, anuluj
                     </ToastAction>
