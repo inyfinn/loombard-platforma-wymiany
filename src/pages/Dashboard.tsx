@@ -37,6 +37,7 @@ import { Switch } from "@/components/ui/switch";
 import { useNavigate } from "react-router-dom";
 import { getPolishVocative } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 interface Widget {
   id: string;
@@ -577,14 +578,16 @@ export default function Dashboard() {
                 setOriginalWidgets(widgets);
                 setEditMode(true);
               } else {
-                toast({
+                const id = toast({
                   description: "Zapisać zmiany w układzie?",
-                  action: {
-                    label: "Tak, zapisz",
-                    onClick: () => {
+                  action: (
+                    <ToastAction altText="Zapisz" onClick={() => {
                       setEditMode(false);
-                    },
-                  },
+                      toast.dismiss(id);
+                    }}>
+                      Tak, zapisz
+                    </ToastAction>
+                  ),
                 });
               }
             }}
@@ -605,15 +608,17 @@ export default function Dashboard() {
             <Button
               variant="outline"
               onClick={() => {
-                toast({
+                const id = toast({
                   description: "Anulować wszystkie zmiany układu?",
-                  action: {
-                    label: "Tak, anuluj",
-                    onClick: () => {
+                  action: (
+                    <ToastAction altText="Anuluj" onClick={() => {
                       if (originalWidgets) setWidgets(originalWidgets);
                       setEditMode(false);
-                    },
-                  },
+                      toast.dismiss(id);
+                    }}>
+                      Tak, anuluj
+                    </ToastAction>
+                  ),
                 });
               }}
             >
