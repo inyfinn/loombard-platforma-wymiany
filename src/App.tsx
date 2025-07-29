@@ -4,15 +4,15 @@ import { Toaster } from "./components/ui/toaster";
 import { PortfolioProvider } from "./context/PortfolioContext";
 import { WelcomeProvider } from "./context/WelcomeContext";
 import { Layout } from "./components/layout";
-import { Index } from "./pages/Index";
-import { Dashboard } from "./pages/Dashboard";
-import { Exchange } from "./pages/Exchange";
-import { Rates } from "./pages/Rates";
-import { History } from "./pages/History";
-import { Profile } from "./pages/Profile";
-import { Settings } from "./pages/Settings";
-import { Portfel } from "./pages/Portfel";
-import { NotFound } from "./pages/NotFound";
+import Index from "./pages/Index";
+import Dashboard from "./pages/Dashboard";
+import Exchange from "./pages/Exchange";
+import Rates from "./pages/Rates";
+import History from "./pages/History";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import Portfel from "./pages/Portfel";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
