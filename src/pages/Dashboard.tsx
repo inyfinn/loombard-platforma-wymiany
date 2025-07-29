@@ -565,6 +565,7 @@ export default function Dashboard() {
   };
 
   return (
+    <>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -697,4 +698,5 @@ export default function Dashboard() {
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  </div>
+    </>
+  );
