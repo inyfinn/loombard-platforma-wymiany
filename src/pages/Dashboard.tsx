@@ -28,7 +28,12 @@ import {
   Mail,
   Star,
   Zap,
-  ChevronLeft
+  ChevronLeft,
+  Sparkles,
+  TrendingUpIcon,
+  Users,
+  Shield,
+  Zap as ZapIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -277,27 +282,34 @@ export default function Dashboard() {
     switch (widget.type) {
       case "total-balance":
         return (
-          <Card key={widget.id} className="col-span-1 md:col-span-2 lg:col-span-2">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-medium">Całkowite Saldo</CardTitle>
+          <Card key={widget.id} className="col-span-1 md:col-span-2 lg:col-span-2 bg-gradient-to-br from-white to-slate-50/50 border-slate-200/50 shadow-lg hover:shadow-xl transition-all duration-300 dark:from-slate-800 dark:to-slate-900/50 dark:border-slate-700/50">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100">Całkowite Saldo</CardTitle>
               {editMode && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => toggleWidgetVisibility(widget.id)}
+                  className="hover:bg-red-100 dark:hover:bg-red-900/20"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4 text-red-500" />
                 </Button>
               )}
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                <div className="text-3xl font-bold animate-pulse-value">
+              <div className="space-y-4">
+                <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent animate-pulse-value">
                   {formatCurrency(totalBalance, baseCurrency)}
                 </div>
-                <div className="flex items-center text-sm text-green-500">
-                  <ArrowUpRight className="w-4 h-4 mr-1" />
-                  +2.4% od wczoraj
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-3 py-1 rounded-full">
+                    <ArrowUpRight className="w-4 h-4 mr-1" />
+                    +2.4% od wczoraj
+                  </div>
+                  <Badge variant="secondary" className="bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                    <TrendingUpIcon className="w-3 h-3 mr-1" />
+                    Wzrost
+                  </Badge>
                 </div>
               </div>
             </CardContent>
@@ -306,29 +318,41 @@ export default function Dashboard() {
 
       case "quick-actions":
         return (
-          <Card key={widget.id} className="col-span-1">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-medium">Szybkie Akcje</CardTitle>
+          <Card key={widget.id} className="col-span-1 bg-gradient-to-br from-white to-slate-50/50 border-slate-200/50 shadow-lg hover:shadow-xl transition-all duration-300 dark:from-slate-800 dark:to-slate-900/50 dark:border-slate-700/50">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100">Szybkie Akcje</CardTitle>
               {editMode && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => toggleWidgetVisibility(widget.id)}
+                  className="hover:bg-red-100 dark:hover:bg-red-900/20"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4 text-red-500" />
                 </Button>
               )}
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button className="w-full" onClick={() => navigate('/exchange')}>
+              <Button 
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300" 
+                onClick={() => navigate('/exchange')}
+              >
                 <ArrowRightLeft className="w-4 h-4 mr-2" />
                 Wymień
               </Button>
-              <Button variant="outline" className="w-full" onClick={() => navigate('/portfel')}>
+              <Button 
+                variant="outline" 
+                className="w-full border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800 transition-all duration-300" 
+                onClick={() => navigate('/portfel')}
+              >
                 <DollarSign className="w-4 h-4 mr-2" />
                 Portfel
               </Button>
-              <Button variant="outline" className="w-full" onClick={() => navigate('/rates')}>
+              <Button 
+                variant="outline" 
+                className="w-full border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800 transition-all duration-300" 
+                onClick={() => navigate('/rates')}
+              >
                 <TrendingUp className="w-4 h-4 mr-2" />
                 Kursy
               </Button>
@@ -338,36 +362,41 @@ export default function Dashboard() {
 
       case "top-currencies":
         return (
-          <Card key={widget.id} className="col-span-1 md:col-span-2">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-medium">Top 3 Waluty</CardTitle>
+          <Card key={widget.id} className="col-span-1 md:col-span-2 bg-gradient-to-br from-white to-slate-50/50 border-slate-200/50 shadow-lg hover:shadow-xl transition-all duration-300 dark:from-slate-800 dark:to-slate-900/50 dark:border-slate-700/50">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100">Top 3 Waluty</CardTitle>
               {editMode && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => toggleWidgetVisibility(widget.id)}
+                  className="hover:bg-red-100 dark:hover:bg-red-900/20"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4 text-red-500" />
                 </Button>
               )}
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {balances.slice(0, 3).map((balance) => (
-                  <div key={balance.code} className="flex items-center justify-between">
+              <div className="space-y-4">
+                {balances.slice(0, 3).map((balance, index) => (
+                  <div key={balance.code} className="flex items-center justify-between p-3 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl hover:bg-slate-100/50 dark:hover:bg-slate-700/50 transition-all duration-300">
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-bold">{balance.code}</span>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        index === 0 ? 'bg-gradient-to-br from-yellow-400 to-orange-500' :
+                        index === 1 ? 'bg-gradient-to-br from-slate-400 to-slate-600' :
+                        'bg-gradient-to-br from-amber-600 to-amber-800'
+                      }`}>
+                        <span className="text-white font-bold text-sm">{balance.code}</span>
                       </div>
                       <div>
-                        <div className="font-medium">{balance.currency}</div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="font-semibold text-slate-900 dark:text-slate-100">{balance.currency}</div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400">
                           {formatCurrency(balance.amount, balance.code)}
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-medium">
+                      <div className="font-semibold text-slate-900 dark:text-slate-100">
                         {formatCurrency(balance.value, baseCurrency)}
                       </div>
                     </div>
@@ -380,27 +409,32 @@ export default function Dashboard() {
 
       case "live-rates":
         return (
-          <Card key={widget.id} className="col-span-1 md:col-span-2">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-medium">Kursy LIVE</CardTitle>
+          <Card key={widget.id} className="col-span-1 md:col-span-2 bg-gradient-to-br from-white to-slate-50/50 border-slate-200/50 shadow-lg hover:shadow-xl transition-all duration-300 dark:from-slate-800 dark:to-slate-900/50 dark:border-slate-700/50">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100">Kursy LIVE</CardTitle>
               {editMode && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => toggleWidgetVisibility(widget.id)}
+                  className="hover:bg-red-100 dark:hover:bg-red-900/20"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4 text-red-500" />
                 </Button>
               )}
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {currentRates.map((rate) => (
-                  <div key={rate.pair} className="flex items-center justify-between">
-                    <div className="font-medium">{rate.pair}</div>
-                    <div className="flex items-center space-x-2">
-                      <span className="font-mono">{rate.rate.toFixed(4)}</span>
-                      <Badge variant={rate.change >= 0 ? "default" : "destructive"}>
+                  <div key={rate.pair} className="flex items-center justify-between p-3 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl hover:bg-slate-100/50 dark:hover:bg-slate-700/50 transition-all duration-300">
+                    <div className="font-semibold text-slate-900 dark:text-slate-100">{rate.pair}</div>
+                    <div className="flex items-center space-x-3">
+                      <span className="font-mono font-semibold text-slate-900 dark:text-slate-100">{rate.rate.toFixed(4)}</span>
+                      <Badge variant={rate.change >= 0 ? "default" : "destructive"} className={
+                        rate.change >= 0 
+                          ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400" 
+                          : "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
+                      }>
                         {rate.change >= 0 ? "+" : ""}{rate.change.toFixed(2)}%
                       </Badge>
                     </div>
@@ -413,33 +447,38 @@ export default function Dashboard() {
 
       case "price-alerts":
         return (
-          <Card key={widget.id} className="col-span-1">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-medium">Alerty Cenowe</CardTitle>
+          <Card key={widget.id} className="col-span-1 bg-gradient-to-br from-white to-slate-50/50 border-slate-200/50 shadow-lg hover:shadow-xl transition-all duration-300 dark:from-slate-800 dark:to-slate-900/50 dark:border-slate-700/50">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100">Alerty Cenowe</CardTitle>
               {editMode && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => toggleWidgetVisibility(widget.id)}
+                  className="hover:bg-red-100 dark:hover:bg-red-900/20"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4 text-red-500" />
                 </Button>
               )}
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {priceAlerts.map((alert) => (
-                  <div key={alert.id} className="flex items-center justify-between p-2 bg-muted rounded">
+                  <div key={alert.id} className="flex items-center justify-between p-3 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl">
                     <div className="text-sm">
-                      <div className="font-medium">{alert.pair}</div>
-                      <div className="text-muted-foreground">
+                      <div className="font-semibold text-slate-900 dark:text-slate-100">{alert.pair}</div>
+                      <div className="text-slate-500 dark:text-slate-400">
                         {alert.condition === "above" ? ">" : "<"} {alert.value}
                       </div>
                     </div>
                     <Switch checked={alert.active} />
                   </div>
                 ))}
-                <Button variant="outline" size="sm" className="w-full mt-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800 transition-all duration-300"
+                >
                   <Plus className="w-4 h-4 mr-2" />
                   Dodaj alert
                 </Button>
@@ -450,46 +489,47 @@ export default function Dashboard() {
 
       case "recent-transactions":
         return (
-          <Card key={widget.id} className="col-span-1 md:col-span-2">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-medium">Ostatnie Transakcje</CardTitle>
+          <Card key={widget.id} className="col-span-1 md:col-span-2 bg-gradient-to-br from-white to-slate-50/50 border-slate-200/50 shadow-lg hover:shadow-xl transition-all duration-300 dark:from-slate-800 dark:to-slate-900/50 dark:border-slate-700/50">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100">Ostatnie Transakcje</CardTitle>
               {editMode && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => toggleWidgetVisibility(widget.id)}
+                  className="hover:bg-red-100 dark:hover:bg-red-900/20"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4 text-red-500" />
                 </Button>
               )}
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {recentTransactions.map((transaction) => (
-                  <div key={transaction.id} className="flex items-center justify-between">
+                  <div key={transaction.id} className="flex items-center justify-between p-3 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl hover:bg-slate-100/50 dark:hover:bg-slate-700/50 transition-all duration-300">
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                         {transaction.type === "exchange" ? (
-                          <ArrowRightLeft className="w-4 h-4" />
+                          <ArrowRightLeft className="w-4 h-4 text-white" />
                         ) : (
-                          <DollarSign className="w-4 h-4" />
+                          <DollarSign className="w-4 h-4 text-white" />
                         )}
                       </div>
                       <div>
-                        <div className="font-medium">
+                        <div className="font-semibold text-slate-900 dark:text-slate-100">
                           {transaction.from} → {transaction.to}
                         </div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-sm text-slate-500 dark:text-slate-400">
                           {formatTime(transaction.date)}
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-medium">
+                      <div className="font-semibold text-slate-900 dark:text-slate-100">
                         {formatCurrency(transaction.amount, transaction.from)}
                       </div>
                       {transaction.profit && (
-                        <div className={`text-sm ${transaction.profit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                        <div className={`text-sm font-medium ${transaction.profit >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                           {transaction.profit >= 0 ? '+' : ''}{formatCurrency(transaction.profit, baseCurrency)}
                         </div>
                       )}
@@ -503,29 +543,33 @@ export default function Dashboard() {
 
       case "ai-prediction":
         return (
-          <Card key={widget.id} className="col-span-1">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-medium">AI Doradza</CardTitle>
+          <Card key={widget.id} className="col-span-1 bg-gradient-to-br from-white to-slate-50/50 border-slate-200/50 shadow-lg hover:shadow-xl transition-all duration-300 dark:from-slate-800 dark:to-slate-900/50 dark:border-slate-700/50">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100">AI Doradza</CardTitle>
               {editMode && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => toggleWidgetVisibility(widget.id)}
+                  className="hover:bg-red-100 dark:hover:bg-red-900/20"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4 text-red-500" />
                 </Button>
               )}
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex items-center space-x-2">
-                  <Brain className="w-5 h-5 text-primary" />
-                  <span className="text-sm font-medium">EUR/PLN</span>
+                  <Brain className="w-5 h-5 text-purple-600" />
+                  <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">EUR/PLN</span>
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-800/50 p-3 rounded-lg">
                   Wzrost o 0.8% w ciągu 24h. Zalecam sprzedaż części pozycji.
                 </div>
-                <Button size="sm" className="w-full">
+                <Button 
+                  size="sm" 
+                  className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white transition-all duration-300"
+                >
                   Zobacz szczegóły
                 </Button>
               </div>
@@ -535,24 +579,25 @@ export default function Dashboard() {
 
       case "portfolio-chart":
         return (
-          <Card key={widget.id} className="col-span-1 md:col-span-2 lg:col-span-2">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-medium">Wykres Portfela</CardTitle>
+          <Card key={widget.id} className="col-span-1 md:col-span-2 lg:col-span-2 bg-gradient-to-br from-white to-slate-50/50 border-slate-200/50 shadow-lg hover:shadow-xl transition-all duration-300 dark:from-slate-800 dark:to-slate-900/50 dark:border-slate-700/50">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100">Wykres Portfela</CardTitle>
               {editMode && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => toggleWidgetVisibility(widget.id)}
+                  className="hover:bg-red-100 dark:hover:bg-red-900/20"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4 text-red-500" />
                 </Button>
               )}
             </CardHeader>
             <CardContent>
-              <div className="h-64 bg-muted rounded-lg flex items-center justify-center">
+              <div className="h-64 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-xl flex items-center justify-center border border-slate-200/50 dark:border-slate-700/50">
                 <div className="text-center">
-                  <BarChart3 className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-muted-foreground">Wykres portfela</p>
+                  <BarChart3 className="w-12 h-12 text-slate-400 mx-auto mb-2" />
+                  <p className="text-slate-500 dark:text-slate-400">Wykres portfela</p>
                 </div>
               </div>
             </CardContent>
@@ -566,14 +611,18 @@ export default function Dashboard() {
 
   return (
     <>
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Cześć, {getPolishVocative(userName)}</h1>
-          <p className="text-muted-foreground">Witaj ponownie! Oto podsumowanie Twojego konta.</p>
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 dark:from-slate-100 dark:to-slate-400 bg-clip-text text-transparent">
+            Cześć, {getPolishVocative(userName)}! 👋
+          </h1>
+          <p className="text-lg text-slate-600 dark:text-slate-400">
+            Witaj ponownie! Oto podsumowanie Twojego konta.
+          </p>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
           <Button
             variant={editMode ? "default" : "outline"}
             onClick={() => {
@@ -584,6 +633,10 @@ export default function Dashboard() {
                 setShowSaveDialog(true);
               }
             }}
+            className={editMode 
+              ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg" 
+              : "border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+            }
           >
             {editMode ? (
               <>
@@ -601,12 +654,72 @@ export default function Dashboard() {
             <Button
               variant="outline"
               onClick={() => setShowCancelDialog(true)}
+              className="border-red-200 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-900/20"
             >
               <X className="w-4 h-4 mr-2" />
               Anuluj zmiany
             </Button>
           )}
         </div>
+      </div>
+
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100/50 border-blue-200/50 dark:from-blue-900/20 dark:to-blue-800/20 dark:border-blue-700/50">
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Dzisiejszy zysk</p>
+                <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">+2.4%</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-green-50 to-green-100/50 border-green-200/50 dark:from-green-900/20 dark:to-green-800/20 dark:border-green-700/50">
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-green-600 dark:text-green-400">Transakcje</p>
+                <p className="text-2xl font-bold text-green-900 dark:text-green-100">12</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100/50 border-purple-200/50 dark:from-purple-900/20 dark:to-purple-800/20 dark:border-purple-700/50">
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center">
+                <Users className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-purple-600 dark:text-purple-400">Aktywni użytkownicy</p>
+                <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">1,234</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100/50 border-orange-200/50 dark:from-orange-900/20 dark:to-orange-800/20 dark:border-orange-700/50">
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center">
+                <Shield className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-orange-600 dark:text-orange-400">Bezpieczeństwo</p>
+                <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">99.9%</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Widgets Grid */}
@@ -627,9 +740,9 @@ export default function Dashboard() {
 
       {/* Widget Library (visible only in edit mode) */}
       {editMode && (
-        <Card>
+        <Card className="bg-gradient-to-br from-white to-slate-50/50 border-slate-200/50 shadow-lg dark:from-slate-800 dark:to-slate-900/50 dark:border-slate-700/50">
           <CardHeader>
-            <CardTitle>Dodaj widget</CardTitle>
+            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100">Dodaj widget</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -642,7 +755,7 @@ export default function Dashboard() {
                 <Button
                   key={widget.id}
                   variant="outline"
-                  className="h-20 flex flex-col items-center justify-center"
+                  className="h-20 flex flex-col items-center justify-center border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800 transition-all duration-300"
                   onClick={() => {
                     const newWidget: Widget = {
                       id: `${widget.id}-${Date.now()}`,
