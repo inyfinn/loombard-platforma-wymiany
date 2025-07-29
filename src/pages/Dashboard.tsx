@@ -611,7 +611,7 @@ export default function Dashboard() {
       {/* Widgets Grid */}
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={widgets.filter(w => w.visible).sort((a,b)=>a.position-b.position).map(w=>w.id)} strategy={verticalListSortingStrategy}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {widgets
               .filter(widget => widget.visible)
               .sort((a, b) => a.position - b.position)
