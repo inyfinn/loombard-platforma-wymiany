@@ -47,18 +47,30 @@ interface PortfolioProviderProps {
 
 // Aktualne kursy walut (symulowane) - aktualizowane w czasie rzeczywistym
 const getExchangeRates = () => ({
-  EUR: 4.35 + (Math.random() - 0.5) * 0.1, // Wahania ±0.05
-  USD: 3.98 + (Math.random() - 0.5) * 0.08,
-  GBP: 5.12 + (Math.random() - 0.5) * 0.12,
-  CHF: 4.48 + (Math.random() - 0.5) * 0.15,
+  EUR: 4.3245 + (Math.random() - 0.5) * 0.1, // Wahania ±0.05
+  USD: 3.9876 + (Math.random() - 0.5) * 0.08,
+  GBP: 5.1234 + (Math.random() - 0.5) * 0.12,
+  CHF: 4.5000 + (Math.random() - 0.5) * 0.15,
+  JPY: 0.0267 + (Math.random() - 0.5) * 0.001,
+  CAD: 2.9456 + (Math.random() - 0.5) * 0.05,
+  AUD: 2.6234 + (Math.random() - 0.5) * 0.04,
+  CNY: 0.5523 + (Math.random() - 0.5) * 0.01,
+  SEK: 0.3876 + (Math.random() - 0.5) * 0.005,
+  NOK: 0.3845 + (Math.random() - 0.5) * 0.005,
+  DKK: 0.5802 + (Math.random() - 0.5) * 0.008,
+  CZK: 0.1723 + (Math.random() - 0.5) * 0.002,
+  HUF: 0.0112 + (Math.random() - 0.5) * 0.0002,
+  RUB: 0.0432 + (Math.random() - 0.5) * 0.001,
   PLN: 1.00
 });
 
 export const PortfolioProvider = ({ children }: PortfolioProviderProps) => {
   const [balances, setBalances] = useState<CurrencyBalance[]>([
-    { code: 'PLN', amount: 5000, name: 'Złoty polski', symbol: 'zł' },
-    { code: 'EUR', amount: 2000, name: 'Euro', symbol: '€' },
-    { code: 'USD', amount: 2000, name: 'Dolar amerykański', symbol: '$' }
+    { code: 'PLN', amount: 45230.50, name: 'Złoty polski', symbol: 'zł' },
+    { code: 'EUR', amount: 12500.00, name: 'Euro', symbol: '€' },
+    { code: 'USD', amount: 8900.00, name: 'Dolar amerykański', symbol: '$' },
+    { code: 'GBP', amount: 3200.00, name: 'Funt brytyjski', symbol: '£' },
+    { code: 'CHF', amount: 1500.00, name: 'Frank szwajcarski', symbol: 'CHF' }
   ]);
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -97,18 +109,7 @@ export const PortfolioProvider = ({ children }: PortfolioProviderProps) => {
       throw new Error(`Niewystarczające środki w ${fromCurrency}`);
     }
 
-    // Aktualizuj salda
-    setBalances(prev => prev.map(balance => {
-      if (balance.code === fromCurrency) {
-        return { ...balance, amount: balance.amount - amount };
-      }
-      if (balance.code === toCurrency) {
-        return { ...balance, amount: balance.amount + toAmount };
-      }
-      return balance;
-    }));
-
-    // Dodaj transakcję
+    // Dodaj transakcję (salda zostaną zaktualizowane w addTransaction)
     addTransaction({
       type: 'exchange',
       fromCurrency,

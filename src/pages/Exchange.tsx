@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { CurrencySelect } from "@/components/ui/currency-select";
 import { useNavigate } from "react-router-dom";
 import { usePortfolio } from "../context/PortfolioContext";
 import { useToast } from "@/hooks/use-toast";
@@ -29,16 +30,17 @@ export default function Exchange() {
   const [activeTab, setActiveTab] = useState("market");
   
   // Exchange state
-  const [fromCurrency, setFromCurrency] = useState("EUR");
+  const [fromCurrency, setFromCurrency] = useState("");
   const [toCurrency, setToCurrency] = useState("PLN");
   const [amount, setAmount] = useState("");
   const [rate, setRate] = useState(4.3245);
   const [fee, setFee] = useState(0.5);
+  const [availableCurrencies, setAvailableCurrencies] = useState<Currency[]>([]);
   
   // Limit order state
   const [limitPrice, setLimitPrice] = useState("");
   const [orderType, setOrderType] = useState<"buy" | "sell">("buy");
-  const [expiryDate, setExpiryDate] = useState("");
+  const [expiryDate, setExpiryDate] = useState(new Date().toISOString().split('T')[0]);
   
   // Confirmation modal state
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -47,13 +49,43 @@ export default function Exchange() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [confirmationData, setConfirmationData] = useState<any>(null);
 
-  const currencies: Currency[] = [
-    { code: "PLN", name: "Złoty Polski", flag: "🇵🇱", rate: 1, available: 45230.50, change24h: 0 },
-    { code: "EUR", name: "Euro", flag: "🇪🇺", rate: 4.3245, available: 12500.00, change24h: 0.12 },
-    { code: "USD", name: "Dolar Amerykański", flag: "🇺🇸", rate: 3.9876, available: 8900.00, change24h: -0.08 },
-    { code: "GBP", name: "Funt Brytyjski", flag: "🇬🇧", rate: 5.1234, available: 3200.00, change24h: 0.25 },
-    { code: "CHF", name: "Frank Szwajcarski", flag: "🇨🇭", rate: 4.5000, available: 1500.00, change24h: 0.05 },
+  // Wszystkie dostępne waluty ISO 4217 z aliasami
+  const allCurrencies: Currency[] = [
+    { code: "PLN", name: "Złoty Polski", flag: "🇵🇱", rate: 1, available: 45230.50, change24h: 0, aliases: ["złoty", "polski", "zł"] },
+    { code: "EUR", name: "Euro", flag: "🇪🇺", rate: 4.3245, available: 12500.00, change24h: 0.12, aliases: ["euro", "eu", "€"] },
+    { code: "USD", name: "Dolar Amerykański", flag: "🇺🇸", rate: 3.9876, available: 8900.00, change24h: -0.08, aliases: ["dolar", "us", "$", "dollar"] },
+    { code: "GBP", name: "Funt Brytyjski", flag: "🇬🇧", rate: 5.1234, available: 3200.00, change24h: 0.25, aliases: ["funt", "gb", "£", "pound"] },
+    { code: "CHF", name: "Frank Szwajcarski", flag: "🇨🇭", rate: 4.5000, available: 1500.00, change24h: 0.05, aliases: ["frank", "szwajcarski", "ch"] },
+    { code: "JPY", name: "Jen Japoński", flag: "🇯🇵", rate: 0.0267, available: 0, change24h: 0.03, aliases: ["jen", "japoński", "japan", "¥"] },
+    { code: "CAD", name: "Dolar Kanadyjski", flag: "🇨🇦", rate: 2.9456, available: 0, change24h: -0.15, aliases: ["dolar kanadyjski", "canada", "c$"] },
+    { code: "AUD", name: "Dolar Australijski", flag: "🇦🇺", rate: 2.6234, available: 0, change24h: 0.08, aliases: ["dolar australijski", "australia", "a$"] },
+    { code: "CNY", name: "Juan Chiński", flag: "🇨🇳", rate: 0.5523, available: 0, change24h: 0.02, aliases: ["juan", "chiński", "china", "renminbi", "¥"] },
+    { code: "SEK", name: "Korona Szwedzka", flag: "🇸🇪", rate: 0.3876, available: 0, change24h: -0.05, aliases: ["korona szwedzka", "sweden", "kr"] },
+    { code: "NOK", name: "Korona Norweska", flag: "🇳🇴", rate: 0.3845, available: 0, change24h: 0.12, aliases: ["korona norweska", "norway", "kr"] },
+    { code: "DKK", name: "Korona Duńska", flag: "🇩🇰", rate: 0.5802, available: 0, change24h: 0.01, aliases: ["korona duńska", "denmark", "kr"] },
+    { code: "CZK", name: "Korona Czeska", flag: "🇨🇿", rate: 0.1723, available: 0, change24h: -0.08, aliases: ["korona czeska", "czech", "kč"] },
+    { code: "HUF", name: "Forint", flag: "🇭🇺", rate: 0.0112, available: 0, change24h: 0.15, aliases: ["forint", "hungary", "ft"] },
+    { code: "RUB", name: "Rubel Rosyjski", flag: "🇷🇺", rate: 0.0432, available: 0, change24h: -0.25, aliases: ["rubel", "rosyjski", "russia", "₽"] },
   ];
+
+  // Filtruj waluty na podstawie sald użytkownika
+  useEffect(() => {
+    const userCurrencies = allCurrencies.filter(currency => {
+      const balance = balances.find(b => b.code === currency.code);
+      return balance && balance.amount > 0;
+    });
+    setAvailableCurrencies(userCurrencies);
+    
+    // Ustaw domyślną walutę "z" na pierwszą dostępną
+    if (userCurrencies.length > 0 && !fromCurrency) {
+      setFromCurrency(userCurrencies[0].code);
+    }
+    
+    // Ustaw domyślną walutę "na" na PLN, chyba że "z" to PLN
+    if (!toCurrency && fromCurrency) {
+      setToCurrency(fromCurrency === "PLN" ? "EUR" : "PLN");
+    }
+  }, [balances, fromCurrency, toCurrency]);
 
   // Handle incoming navigation state
   useEffect(() => {
@@ -71,15 +103,7 @@ export default function Exchange() {
     }
   }, [location.state]);
 
-  // Update rate when currencies change
-  useEffect(() => {
-    try {
-      const newRate = calculateExchange(fromCurrency, toCurrency, 1);
-      setRate(newRate);
-    } catch (error) {
-      console.error('Error calculating rate:', error);
-    }
-  }, [fromCurrency, toCurrency, calculateExchange]);
+
 
   // Countdown timer for confirmation
   useEffect(() => {
@@ -107,6 +131,48 @@ export default function Exchange() {
     return { result, feeAmount };
   };
 
+  // Aktualizuj kurs gdy zmieniają się waluty
+  useEffect(() => {
+    if (fromCurrency && toCurrency) {
+      try {
+        const newRate = calculateExchange(fromCurrency, toCurrency, 1);
+        setRate(newRate);
+      } catch (error) {
+        console.error('Error calculating rate:', error);
+        setRate(0);
+      }
+    }
+  }, [fromCurrency, toCurrency, calculateExchange]);
+
+  // Aktualizuj kursy co sekundę
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (fromCurrency && toCurrency) {
+        try {
+          const newRate = calculateExchange(fromCurrency, toCurrency, 1);
+          setRate(newRate);
+        } catch (error) {
+          console.error('Error updating rate:', error);
+        }
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [fromCurrency, toCurrency, calculateExchange]);
+
+  // Sprawdź czy użytkownik ma wystarczające środki
+  const getAvailableBalance = (currencyCode: string) => {
+    const balance = balances.find(b => b.code === currencyCode);
+    return balance ? balance.amount : 0;
+  };
+
+  // Sprawdź czy kwota nie przekracza dostępnego salda
+  const isAmountValid = () => {
+    const numAmount = parseFloat(amount) || 0;
+    const availableBalance = getAvailableBalance(fromCurrency);
+    return numAmount > 0 && numAmount <= availableBalance;
+  };
+
   const handleExchange = async (type: "instant" | "limit") => {
     if (!fromCurrency || !toCurrency || !amount || parseFloat(amount) <= 0) {
       toast({
@@ -118,11 +184,11 @@ export default function Exchange() {
     }
 
     // Sprawdź czy użytkownik ma wystarczające środki
-    const fromBalance = balances.find(b => b.code === fromCurrency);
-    if (!fromBalance || fromBalance.amount < parseFloat(amount)) {
+    if (!isAmountValid()) {
+      const availableBalance = getAvailableBalance(fromCurrency);
       toast({
         title: "Niewystarczające środki",
-        description: `Nie masz wystarczających środków w ${fromCurrency}`,
+        description: `Nie masz wystarczających środków w ${fromCurrency}. Dostępne: ${formatCurrency(availableBalance, fromCurrency)}`,
         variant: "destructive",
       });
       return;
@@ -180,6 +246,7 @@ export default function Exchange() {
       // Reset form
       setAmount("");
       setLimitPrice("");
+      setExpiryDate(new Date().toISOString().split('T')[0]);
       
       // Przekieruj do historii po chwili
       setTimeout(() => {
@@ -203,13 +270,23 @@ export default function Exchange() {
     <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-gray-200 to-[#02c349] bg-clip-text text-transparent">
-            Wymiana Walut 💱
-          </h1>
-          <p className="text-gray-400 mt-2">
-            Wymieniaj waluty w czasie rzeczywistym
-          </p>
+        <div className="flex items-center space-x-4">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="w-10 h-10 rounded-full border-[#02c349]/20 hover:bg-[#02c349]/10 text-[#02c349] transition-all duration-300"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-gray-200 to-[#02c349] bg-clip-text text-transparent">
+              Wymiana Walut 💱
+            </h1>
+            <p className="text-gray-400 mt-2">
+              Wymieniaj waluty w czasie rzeczywistym
+            </p>
+          </div>
         </div>
       </div>
 
@@ -290,36 +367,42 @@ export default function Exchange() {
               <div className="space-y-3">
                 <Label className="text-sm font-medium text-gray-300">Masz</Label>
                 <div className="flex space-x-3">
-                  <Select value={fromCurrency} onValueChange={setFromCurrency}>
-                    <SelectTrigger className="w-36 bg-[#00071c]/50 border-[#02c349]/20 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#00071c] border-[#02c349]/20">
-                      {currencies.map((currency) => (
-                        <SelectItem key={currency.code} value={currency.code}>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-lg">{currency.flag}</span>
-                            <span className="font-medium text-white">{currency.code}</span>
-                            {currency.change24h !== 0 && (
-                              <Badge variant={currency.change24h > 0 ? "default" : "destructive"} className="ml-auto">
-                                {currency.change24h > 0 ? "+" : ""}{currency.change24h.toFixed(2)}%
-                              </Badge>
-                            )}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <CurrencySelect
+                    currencies={availableCurrencies}
+                    value={fromCurrency}
+                    onValueChange={setFromCurrency}
+                    placeholder="Wybierz walutę..."
+                    showBalance={true}
+                    getBalance={getAvailableBalance}
+                    formatCurrency={formatCurrency}
+                    className="w-36"
+                  />
                   <Input
                     type="number"
                     placeholder="0.00"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     className="flex-1 bg-[#00071c]/50 border-[#02c349]/20 text-white focus:border-[#02c349]"
+                    min="0"
+                    step="0.01"
+                    max={getAvailableBalance(fromCurrency)}
                   />
                 </div>
-                <div className="text-sm text-gray-400">
-                  Dostępne: {formatCurrency(currencies.find(c => c.code === fromCurrency)?.available || 0, fromCurrency)}
+                <div className="text-sm text-gray-400 flex items-center justify-between">
+                  <span>
+                    Dostępne: {formatCurrency(getAvailableBalance(fromCurrency), fromCurrency)}
+                    {parseFloat(amount) > getAvailableBalance(fromCurrency) && (
+                      <span className="text-red-400 ml-2">Kwota przekracza dostępne saldo!</span>
+                    )}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setAmount(getAvailableBalance(fromCurrency).toString())}
+                    className="text-[#02c349] hover:text-[#02c349]/80 text-xs"
+                  >
+                    Maksymalna kwota
+                  </Button>
                 </div>
               </div>
 
@@ -329,10 +412,15 @@ export default function Exchange() {
                   variant="outline"
                   size="icon"
                   onClick={() => {
-                    setFromCurrency(toCurrency);
-                    setToCurrency(fromCurrency);
+                    const tempFrom = fromCurrency;
+                    const tempTo = toCurrency;
+                    setFromCurrency(tempTo);
+                    setToCurrency(tempFrom);
+                    // Reset amount when switching currencies
+                    setAmount("");
                   }}
                   className="w-12 h-12 rounded-full border-[#02c349]/20 hover:bg-[#02c349]/10 text-[#02c349] transition-all duration-300 hover:scale-110"
+                  title="Zamień waluty"
                 >
                   <ArrowRightLeft className="w-5 h-5" />
                 </Button>
@@ -342,26 +430,14 @@ export default function Exchange() {
               <div className="space-y-3">
                 <Label className="text-sm font-medium text-gray-300">Otrzymasz</Label>
                 <div className="flex space-x-3">
-                  <Select value={toCurrency} onValueChange={setToCurrency}>
-                    <SelectTrigger className="w-36 bg-[#00071c]/50 border-[#02c349]/20 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#00071c] border-[#02c349]/20">
-                      {currencies.map((currency) => (
-                        <SelectItem key={currency.code} value={currency.code}>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-lg">{currency.flag}</span>
-                            <span className="font-medium text-white">{currency.code}</span>
-                            {currency.change24h !== 0 && (
-                              <Badge variant={currency.change24h > 0 ? "default" : "destructive"} className="ml-auto">
-                                {currency.change24h > 0 ? "+" : ""}{currency.change24h.toFixed(2)}%
-                              </Badge>
-                            )}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <CurrencySelect
+                    currencies={allCurrencies}
+                    value={toCurrency}
+                    onValueChange={setToCurrency}
+                    placeholder="Wybierz walutę..."
+                    showBalance={false}
+                    className="w-36"
+                  />
                   <Input
                     type="number"
                     placeholder="0.00"
@@ -376,9 +452,12 @@ export default function Exchange() {
               <div className="space-y-3 p-4 bg-[#00071c]/50 rounded-xl border border-[#02c349]/10">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-400">Kurs wymiany:</span>
-                  <span className="font-mono font-semibold text-white">
-                    1 {fromCurrency} = {rate.toFixed(4)} {toCurrency}
-                  </span>
+                  <div className="flex items-center space-x-2">
+                    <span className="font-mono font-semibold text-white">
+                      1 {fromCurrency} = {rate.toFixed(4)} {toCurrency}
+                    </span>
+                    <div className="w-2 h-2 bg-[#02c349] rounded-full animate-pulse"></div>
+                  </div>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-400">Opłata:</span>
@@ -398,7 +477,7 @@ export default function Exchange() {
                 className="w-full bg-[#02c349] hover:bg-[#02c349]/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 h-12 text-lg font-semibold" 
                 size="lg"
                 onClick={() => handleExchange("instant")}
-                disabled={!amount || parseFloat(amount) <= 0}
+                disabled={!amount || parseFloat(amount) <= 0 || !isAmountValid()}
               >
                 <Sparkles className="w-5 h-5 mr-2" />
                 Wymień teraz
@@ -451,21 +530,15 @@ export default function Exchange() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <Label className="text-sm font-medium text-gray-300">Waluta</Label>
-                  <Select value={fromCurrency} onValueChange={setFromCurrency}>
-                    <SelectTrigger className="bg-[#00071c]/50 border-[#02c349]/20 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#00071c] border-[#02c349]/20">
-                      {currencies.map((currency) => (
-                        <SelectItem key={currency.code} value={currency.code}>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-lg">{currency.flag}</span>
-                            <span className="font-medium text-white">{currency.code}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <CurrencySelect
+                    currencies={availableCurrencies}
+                    value={fromCurrency}
+                    onValueChange={setFromCurrency}
+                    placeholder="Wybierz walutę..."
+                    showBalance={true}
+                    getBalance={getAvailableBalance}
+                    formatCurrency={formatCurrency}
+                  />
                 </div>
                 <div className="space-y-3">
                   <Label className="text-sm font-medium text-gray-300">Ilość</Label>
@@ -475,39 +548,82 @@ export default function Exchange() {
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     className="bg-[#00071c]/50 border-[#02c349]/20 text-white focus:border-[#02c349]"
+                    min="0"
+                    step="0.01"
+                    max={getAvailableBalance(fromCurrency)}
                   />
+                  <div className="text-xs text-gray-400 flex items-center justify-between">
+                    <span>Dostępne: {formatCurrency(getAvailableBalance(fromCurrency), fromCurrency)}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setAmount(getAvailableBalance(fromCurrency).toString())}
+                      className="text-[#02c349] hover:text-[#02c349]/80 text-xs"
+                    >
+                      Maksymalna kwota
+                    </Button>
+                  </div>
                 </div>
               </div>
 
               {/* Limit Price */}
               <div className="space-y-3">
                 <Label className="text-sm font-medium text-gray-300">Cena limitu</Label>
-                <Input
-                  type="number"
-                  placeholder="0.0000"
-                  value={limitPrice}
-                  onChange={(e) => setLimitPrice(e.target.value)}
-                  className="bg-[#00071c]/50 border-[#02c349]/20 text-white focus:border-[#02c349]"
-                />
+                <div className="flex space-x-2">
+                  <Input
+                    type="number"
+                    placeholder="0.0000"
+                    value={limitPrice}
+                    onChange={(e) => setLimitPrice(e.target.value)}
+                    className="flex-1 bg-[#00071c]/50 border-[#02c349]/20 text-white focus:border-[#02c349]"
+                    step="0.0001"
+                    min="0"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setLimitPrice(rate.toFixed(4))}
+                    className="border-[#02c349]/20 text-[#02c349] hover:bg-[#02c349]/10"
+                  >
+                    Aktualny kurs
+                  </Button>
+                </div>
+                <div className="text-xs text-gray-400">
+                  Aktualny kurs: {rate.toFixed(4)}
+                </div>
               </div>
 
               {/* Expiry Date */}
               <div className="space-y-3">
                 <Label className="text-sm font-medium text-gray-300">Data ważności</Label>
-                <Input
-                  type="date"
-                  value={expiryDate}
-                  onChange={(e) => setExpiryDate(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
-                  className="bg-[#00071c]/50 border-[#02c349]/20 text-white focus:border-[#02c349]"
-                />
+                <div className="flex space-x-2">
+                  <Input
+                    type="date"
+                    value={expiryDate}
+                    onChange={(e) => setExpiryDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    className="flex-1 bg-[#00071c]/50 border-[#02c349]/20 text-white focus:border-[#02c349]"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const tomorrow = new Date();
+                      tomorrow.setDate(tomorrow.getDate() + 1);
+                      setExpiryDate(tomorrow.toISOString().split('T')[0]);
+                    }}
+                    className="border-[#02c349]/20 text-[#02c349] hover:bg-[#02c349]/10"
+                  >
+                    Jutro
+                  </Button>
+                </div>
               </div>
 
               <Button 
                 className="w-full bg-[#02c349] hover:bg-[#02c349]/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 h-12 text-lg font-semibold" 
                 size="lg"
                 onClick={() => handleExchange("limit")}
-                disabled={!amount || !limitPrice || !expiryDate}
+                disabled={!amount || !limitPrice || !expiryDate || !isAmountValid()}
               >
                 <Clock className="w-4 h-4 mr-2" />
                 Utwórz zlecenie
@@ -570,6 +686,23 @@ export default function Exchange() {
                   </div>
                 </div>
               </div>
+              
+              {/* Countdown Timer */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-400">Czas na anulowanie:</span>
+                  <span className={`text-lg font-bold ${isCountdownCritical ? 'text-red-500 animate-pulse' : 'text-white'}`}>
+                    {countdown}s
+                  </span>
+                </div>
+                <Progress 
+                  value={(countdown / 15) * 100} 
+                  className={`h-2 ${isCountdownCritical ? 'bg-red-500/20' : 'bg-[#02c349]/20'}`}
+                />
+                <div className="text-xs text-gray-500 text-center">
+                  {countdown > 2 ? "Przez pierwsze 2 sekundy przycisk jest nieaktywny" : "Możesz teraz potwierdzić transakcję"}
+                </div>
+              </div>
             </div>
           )}
           
@@ -584,8 +717,12 @@ export default function Exchange() {
             </Button>
             <Button 
               onClick={handleConfirmExchange}
-              disabled={isProcessing}
-              className="bg-[#02c349] hover:bg-[#02c349]/90 text-white"
+              disabled={isProcessing || countdown > 13}
+              className={`${
+                isCountdownCritical 
+                  ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
+                  : 'bg-[#02c349] hover:bg-[#02c349]/90'
+              } text-white`}
             >
               {isProcessing ? "Przetwarzanie..." : "Potwierdź"}
             </Button>
