@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    outDir: mode === 'production' ? 'docs' : 'dist',
+    outDir: 'dist',
     assetsDir: "assets",
     sourcemap: false,
     chunkSizeWarningLimit: 1000,
