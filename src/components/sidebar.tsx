@@ -62,7 +62,7 @@ export function Sidebar() {
               </div>
               <div>
                 <h1 className="font-bold text-lg bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  Loombard
+                  KANTOOR.pl
                 </h1>
                 <p className="text-xs text-slate-500 dark:text-slate-400">Wymiana walut</p>
               </div>

@@ -115,7 +115,7 @@ Tło: #00071c (ciemny granat)
 }
 
 @layer components {
-  /* Loombard Widget Cards */
+  /* KANTOOR.pl Widget Cards */
   .widget-card {
     @apply bg-card border border-border rounded-xl p-6 transition-all duration-300;
     box-shadow: var(--shadow-widget);
@@ -136,14 +136,14 @@ Tło: #00071c (ciemny granat)
     border-color: rgba(2, 195, 73, 0.2);
   }
 
-  /* Loombard Buttons */
-  .loombard-button-primary {
+  /* KANTOOR.pl Buttons */
+  .kantoor-button-primary {
     @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 font-medium;
     transition: var(--transition-smooth);
     background-color: #02c349;
   }
 
-  .loombard-button-secondary {
+  .kantoor-button-secondary {
     @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border rounded-lg px-4 py-2 font-medium;
     transition: var(--transition-smooth);
     background-color: rgba(2, 195, 73, 0.1);
@@ -259,19 +259,19 @@ Tło: #00071c (ciemny granat)
     background-clip: text;
   }
 
-  .bg-loombard-dark {
+  .bg-kantoor-dark {
     background-color: #00071c;
   }
 
-  .text-loombard-green {
+  .text-kantoor-green {
     color: #02c349;
   }
 
-  .border-loombard-green {
+  .border-kantoor-green {
     border-color: rgba(2, 195, 73, 0.2);
   }
 
-  .hover-border-loombard-green:hover {
+  .hover-border-kantoor-green:hover {
     border-color: rgba(2, 195, 73, 0.4);
   }
 }

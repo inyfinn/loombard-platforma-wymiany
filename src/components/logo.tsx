@@ -12,7 +12,7 @@ export function Logo() {
         L
       </div>
       <div className="flex flex-col text-xs leading-tight">
-        <span className="font-bold text-foreground">Loombard</span>
+        <span className="font-bold text-foreground">KANTOOR.pl</span>
         <span className="text-muted-foreground text-[10px]">Platforma wymiany walut</span>
       </div>
     </div>

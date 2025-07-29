@@ -357,7 +357,7 @@ export default function History() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `loombard-transactions-${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = `kantoor-transactions-${new Date().toISOString().split('T')[0]}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

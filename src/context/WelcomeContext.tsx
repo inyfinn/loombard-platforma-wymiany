@@ -27,7 +27,7 @@ export const WelcomeProvider = ({ children }: WelcomeProviderProps) => {
 
   // Sprawdź localStorage przy ładowaniu
   useEffect(() => {
-    const seen = localStorage.getItem('loombard-welcome-seen');
+    const seen = localStorage.getItem('kantoor-welcome-seen');
     if (!seen) {
       // Pokaż popup po krótkim opóźnieniu
       const timer = setTimeout(() => {
@@ -43,9 +43,9 @@ export const WelcomeProvider = ({ children }: WelcomeProviderProps) => {
   const handleSetHasSeenWelcome = (seen: boolean) => {
     setHasSeenWelcome(seen);
     if (seen) {
-      localStorage.setItem('loombard-welcome-seen', 'true');
+      localStorage.setItem('kantoor-welcome-seen', 'true');
     } else {
-      localStorage.removeItem('loombard-welcome-seen');
+      localStorage.removeItem('kantoor-welcome-seen');
     }
   };
 

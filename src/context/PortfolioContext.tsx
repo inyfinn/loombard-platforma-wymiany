@@ -158,14 +158,14 @@ export const PortfolioProvider = ({ children }: PortfolioProviderProps) => {
 
   // Zapisz dane do localStorage przy każdej zmianie
   useEffect(() => {
-    localStorage.setItem('loombard-portfolio-balances', JSON.stringify(balances));
-    localStorage.setItem('loombard-portfolio-transactions', JSON.stringify(transactions));
+    localStorage.setItem('kantoor-portfolio-balances', JSON.stringify(balances));
+    localStorage.setItem('kantoor-portfolio-transactions', JSON.stringify(transactions));
   }, [balances, transactions]);
 
   // Wczytaj dane z localStorage przy starcie
   useEffect(() => {
-    const savedBalances = localStorage.getItem('loombard-portfolio-balances');
-    const savedTransactions = localStorage.getItem('loombard-portfolio-transactions');
+    const savedBalances = localStorage.getItem('kantoor-portfolio-balances');
+    const savedTransactions = localStorage.getItem('kantoor-portfolio-transactions');
     
     if (savedBalances) {
       setBalances(JSON.parse(savedBalances));

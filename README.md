@@ -1,4 +1,4 @@
-# Loombard - Platforma Wymiany Walut
+# KANTOOR.pl - Platforma Wymiany Walut
 
 Zaawansowana platforma wymiany walut z w pełni konfigurowalnym dashboardem, drag & drop widgetami i nowoczesnym interfejsem użytkownika.
 

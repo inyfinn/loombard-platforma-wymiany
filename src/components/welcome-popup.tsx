@@ -99,7 +99,7 @@ export const WelcomePopup = ({ isOpen, onClose }: WelcomePopupProps) => {
                     
                     {/* Logo karty */}
                     <div className="absolute top-6 left-6">
-                      <div className="text-black font-bold text-lg">Loombard Card</div>
+                      <div className="text-black font-bold text-lg">KANTOOR.pl Card</div>
                       <div className="text-black font-semibold text-sm">Premium</div>
                     </div>
 

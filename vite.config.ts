@@ -7,7 +7,7 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   // Stała ścieżka bazowa – niezmienna dla builda i dev.
   // Vite w trybie dev ignoruje "base", więc nie wpływa to na localhost.
-  base: "/loombard-platforma-wymiany/",
+      base: "/kantoor-platforma-wymiany/",
   server: {
     host: "::",
     port: 8080,
