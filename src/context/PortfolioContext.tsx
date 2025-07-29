@@ -1,95 +1,195 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-interface Balance {
+interface CurrencyBalance {
   code: string;
   amount: number;
+  name: string;
+  symbol: string;
 }
 
 interface Transaction {
   id: string;
-  from: string;
-  to: string;
-  amount: number;
+  type: 'buy' | 'sell' | 'exchange' | 'deposit' | 'withdrawal';
+  fromCurrency: string;
+  toCurrency: string;
+  fromAmount: number;
+  toAmount: number;
   rate: number;
-  date: string;
+  timestamp: Date;
+  status: 'pending' | 'completed' | 'cancelled';
 }
 
-interface PortfolioContextProps {
-  balances: Balance[];
+interface PortfolioContextType {
+  balances: CurrencyBalance[];
   transactions: Transaction[];
-  exchange: (from: string, to: string, amount: number, rate: number) => void;
+  totalValuePLN: number;
+  addTransaction: (transaction: Omit<Transaction, 'id' | 'timestamp'>) => void;
+  updateBalance: (currencyCode: string, amount: number) => void;
+  getBalance: (currencyCode: string) => number;
+  calculateTotalValue: () => number;
+  calculateExchange: (fromCurrency: string, toCurrency: string, amount: number) => number;
+  executeExchange: (fromCurrency: string, toCurrency: string, amount: number, rate: number) => void;
 }
 
-const PortfolioContext = createContext<PortfolioContextProps | undefined>(undefined);
+const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
 
-const DEFAULT_BALANCES: Balance[] = [
-  { code: "PLN", amount: 5000 },
-  { code: "EUR", amount: 2000 },
-  { code: "USD", amount: 2000 },
-];
+export const usePortfolio = () => {
+  const context = useContext(PortfolioContext);
+  if (context === undefined) {
+    throw new Error('usePortfolio must be used within a PortfolioProvider');
+  }
+  return context;
+};
 
-export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [balances, setBalances] = useState<Balance[]>([]);
+interface PortfolioProviderProps {
+  children: ReactNode;
+}
+
+// Aktualne kursy walut (symulowane) - aktualizowane w czasie rzeczywistym
+const getExchangeRates = () => ({
+  EUR: 4.35 + (Math.random() - 0.5) * 0.1, // Wahania ±0.05
+  USD: 3.98 + (Math.random() - 0.5) * 0.08,
+  GBP: 5.12 + (Math.random() - 0.5) * 0.12,
+  CHF: 4.48 + (Math.random() - 0.5) * 0.15,
+  PLN: 1.00
+});
+
+export const PortfolioProvider = ({ children }: PortfolioProviderProps) => {
+  const [balances, setBalances] = useState<CurrencyBalance[]>([
+    { code: 'PLN', amount: 5000, name: 'Złoty polski', symbol: 'zł' },
+    { code: 'EUR', amount: 2000, name: 'Euro', symbol: '€' },
+    { code: 'USD', amount: 2000, name: 'Dolar amerykański', symbol: '$' }
+  ]);
+
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [exchangeRates, setExchangeRates] = useState(getExchangeRates());
 
-  // Load from localStorage
+  // Aktualizuj kursy co 30 sekund
   useEffect(() => {
-    try {
-      const savedBalances = localStorage.getItem("loombard-balances");
-      const savedTx = localStorage.getItem("loombard-transactions");
-      if (savedBalances) {
-        setBalances(JSON.parse(savedBalances));
-      } else {
-        setBalances(DEFAULT_BALANCES);
+    const interval = setInterval(() => {
+      setExchangeRates(getExchangeRates());
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const calculateTotalValue = (): number => {
+    return balances.reduce((total, balance) => {
+      const rate = exchangeRates[balance.code as keyof typeof exchangeRates] || 1;
+      return total + (balance.amount * rate);
+    }, 0);
+  };
+
+  const totalValuePLN = calculateTotalValue();
+
+  const calculateExchange = (fromCurrency: string, toCurrency: string, amount: number): number => {
+    const fromRate = exchangeRates[fromCurrency as keyof typeof exchangeRates] || 1;
+    const toRate = exchangeRates[toCurrency as keyof typeof exchangeRates] || 1;
+    return (amount * fromRate) / toRate;
+  };
+
+  const executeExchange = (fromCurrency: string, toCurrency: string, amount: number, rate: number) => {
+    const toAmount = calculateExchange(fromCurrency, toCurrency, amount);
+    
+    // Sprawdź czy użytkownik ma wystarczające środki
+    const fromBalance = balances.find(b => b.code === fromCurrency);
+    if (!fromBalance || fromBalance.amount < amount) {
+      throw new Error(`Niewystarczające środki w ${fromCurrency}`);
+    }
+
+    // Aktualizuj salda
+    setBalances(prev => prev.map(balance => {
+      if (balance.code === fromCurrency) {
+        return { ...balance, amount: balance.amount - amount };
       }
-      if (savedTx) setTransactions(JSON.parse(savedTx));
-    } catch {
-      setBalances(DEFAULT_BALANCES);
+      if (balance.code === toCurrency) {
+        return { ...balance, amount: balance.amount + toAmount };
+      }
+      return balance;
+    }));
+
+    // Dodaj transakcję
+    addTransaction({
+      type: 'exchange',
+      fromCurrency,
+      toCurrency,
+      fromAmount: amount,
+      toAmount: toAmount,
+      rate,
+      status: 'completed'
+    });
+  };
+
+  const addTransaction = (transactionData: Omit<Transaction, 'id' | 'timestamp'>) => {
+    const newTransaction: Transaction = {
+      ...transactionData,
+      id: `txn-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      timestamp: new Date()
+    };
+
+    setTransactions(prev => [newTransaction, ...prev]);
+
+    // Aktualizuj salda po wykonaniu transakcji
+    if (transactionData.status === 'completed') {
+      setBalances(prev => prev.map(balance => {
+        if (balance.code === transactionData.fromCurrency) {
+          return { ...balance, amount: balance.amount - transactionData.fromAmount };
+        }
+        if (balance.code === transactionData.toCurrency) {
+          return { ...balance, amount: balance.amount + transactionData.toAmount };
+        }
+        return balance;
+      }));
+    }
+  };
+
+  const updateBalance = (currencyCode: string, amount: number) => {
+    setBalances(prev => prev.map(balance => 
+      balance.code === currencyCode 
+        ? { ...balance, amount } 
+        : balance
+    ));
+  };
+
+  const getBalance = (currencyCode: string): number => {
+    const balance = balances.find(b => b.code === currencyCode);
+    return balance ? balance.amount : 0;
+  };
+
+  // Zapisz dane do localStorage przy każdej zmianie
+  useEffect(() => {
+    localStorage.setItem('loombard-portfolio-balances', JSON.stringify(balances));
+    localStorage.setItem('loombard-portfolio-transactions', JSON.stringify(transactions));
+  }, [balances, transactions]);
+
+  // Wczytaj dane z localStorage przy starcie
+  useEffect(() => {
+    const savedBalances = localStorage.getItem('loombard-portfolio-balances');
+    const savedTransactions = localStorage.getItem('loombard-portfolio-transactions');
+    
+    if (savedBalances) {
+      setBalances(JSON.parse(savedBalances));
+    }
+    if (savedTransactions) {
+      setTransactions(JSON.parse(savedTransactions));
     }
   }, []);
 
-  // Persist
-  useEffect(() => {
-    localStorage.setItem("loombard-balances", JSON.stringify(balances));
-  }, [balances]);
-
-  useEffect(() => {
-    localStorage.setItem("loombard-transactions", JSON.stringify(transactions));
-  }, [transactions]);
-
-  const exchange = (from: string, to: string, amount: number, rate: number) => {
-    setBalances(prev => {
-      const copy = [...prev];
-      const fromIdx = copy.findIndex(b => b.code === from);
-      const toIdx = copy.findIndex(b => b.code === to);
-      const fromAmount = amount;
-      const toAmount = +(amount * rate).toFixed(2);
-      if (fromIdx !== -1) copy[fromIdx].amount = +(copy[fromIdx].amount - fromAmount).toFixed(2);
-      if (toIdx !== -1) copy[toIdx].amount = +(copy[toIdx].amount + toAmount).toFixed(2);
-      return copy;
-    });
-    setTransactions(prev => [
-      {
-        id: Date.now().toString(),
-        from,
-        to,
-        amount,
-        rate,
-        date: new Date().toISOString(),
-      },
-      ...prev,
-    ]);
+  const value = {
+    balances,
+    transactions,
+    totalValuePLN,
+    addTransaction,
+    updateBalance,
+    getBalance,
+    calculateTotalValue,
+    calculateExchange,
+    executeExchange
   };
 
   return (
-    <PortfolioContext.Provider value={{ balances, transactions, exchange }}>
+    <PortfolioContext.Provider value={value}>
       {children}
     </PortfolioContext.Provider>
   );
-};
-
-export const usePortfolio = () => {
-  const ctx = useContext(PortfolioContext);
-  if (!ctx) throw new Error("usePortfolio must be used within PortfolioProvider");
-  return ctx;
 }; 

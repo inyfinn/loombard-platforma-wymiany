@@ -5,7 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 interface Transaction {
   id: number;
@@ -23,10 +25,13 @@ interface Transaction {
 
 export default function History() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterCurrency, setFilterCurrency] = useState("all");
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const transactions: Transaction[] = [
     {
@@ -305,23 +310,92 @@ export default function History() {
 
   const totalFees = filteredTransactions.reduce((sum, t) => sum + t.fee, 0);
 
+  const handleExportData = async () => {
+    setIsExporting(true);
+    try {
+      // Symulacja eksportu danych
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Przygotowanie danych do eksportu
+      const exportData = {
+        transactions: filteredTransactions,
+        filters: {
+          type: filterType,
+          status: filterStatus,
+          currency: filterCurrency,
+          searchTerm
+        },
+        summary: {
+          totalTransactions: filteredTransactions.length,
+          totalProfit,
+          totalFees,
+          completedTransactions: filteredTransactions.filter(t => t.status === 'completed').length
+        },
+        exportDate: new Date().toISOString()
+      };
+      
+      // Tworzenie pliku CSV
+      const headers = ['ID', 'Typ', 'Z', 'Na', 'Kwota', 'Kurs', 'Zysk/Strata', 'Opłata', 'Status', 'Data', 'Referencja'];
+      const csvContent = [
+        headers.join(','),
+        ...filteredTransactions.map(t => [
+          t.id,
+          t.type,
+          t.from,
+          t.to,
+          t.amount,
+          t.rate,
+          t.profit || 0,
+          t.fee,
+          t.status,
+          t.date,
+          t.reference
+        ].join(','))
+      ].join('\n');
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `loombard-transactions-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Dane wyeksportowane",
+        description: "Historia transakcji została pobrana jako plik CSV.",
+      });
+      setShowExportDialog(false);
+    } catch (error) {
+      toast({
+        title: "Błąd eksportu",
+        description: "Nie udało się wyeksportować danych. Spróbuj ponownie.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center space-x-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate(-1)}
-          className="hover:bg-muted"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold">Historia Transakcji</h1>
-          <p className="text-muted-foreground">Przegląd wszystkich operacji</p>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-600 bg-clip-text text-transparent">
+            Historia Transakcji 📋
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-2">
+            Przegląd operacji - funkcje w fazie rozwoju
+          </p>
         </div>
-        <Button variant="outline">
+        <Button 
+          variant="outline"
+          className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-950"
+          onClick={() => setShowExportDialog(true)}
+        >
           <Download className="w-4 h-4 mr-2" />
           Eksportuj
         </Button>
@@ -524,6 +598,41 @@ export default function History() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Export Dialog */}
+      <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Eksport historii transakcji</DialogTitle>
+            <DialogDescription>
+              Wyeksportuj historię transakcji w formacie CSV. 
+              Plik będzie zawierał wszystkie transakcje zgodnie z aktualnymi filtrami.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="p-4 bg-muted rounded-lg">
+              <h4 className="font-medium mb-2">Podsumowanie eksportu:</h4>
+              <ul className="text-sm space-y-1">
+                <li>• Liczba transakcji: {filteredTransactions.length}</li>
+                <li>• Łączny zysk/strata: {formatCurrency(totalProfit, 'PLN')}</li>
+                <li>• Łączne opłaty: {formatCurrency(totalFees, 'PLN')}</li>
+                <li>• Zakończone transakcje: {filteredTransactions.filter(t => t.status === 'completed').length}</li>
+              </ul>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowExportDialog(false)}>
+              Anuluj
+            </Button>
+            <Button 
+              onClick={handleExportData}
+              disabled={isExporting}
+            >
+              {isExporting ? "Eksportowanie..." : "Eksportuj CSV"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

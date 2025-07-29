@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Bell, Mail, Smartphone, Clock, Shield, Zap } from "lucide-react";
+import { ArrowLeft, Bell, Mail, Smartphone, Clock, Shield, Zap, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 interface NotificationSetting {
   id: string;
@@ -27,8 +28,10 @@ interface NotificationSchedule {
 
 export default function NotificationSettings() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [emailFrequency, setEmailFrequency] = useState("daily");
   const [quietHours, setQuietHours] = useState("22:00-08:00");
+  const [isSaving, setIsSaving] = useState(false);
 
   const [notificationSettings, setNotificationSettings] = useState<NotificationSetting[]>([
     {
@@ -116,6 +119,27 @@ export default function NotificationSettings() {
     ));
   };
 
+  const handleSaveSettings = async () => {
+    setIsSaving(true);
+    try {
+      // Symulacja zapisywania ustawień
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      toast({
+        title: "Ustawienia zapisane",
+        description: "Twoje ustawienia powiadomień zostały pomyślnie zaktualizowane.",
+      });
+    } catch (error) {
+      toast({
+        title: "Błąd zapisywania",
+        description: "Nie udało się zapisać ustawień. Spróbuj ponownie.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const getChannelIcon = (channel: string) => {
     switch (channel) {
       case "email":
@@ -145,19 +169,23 @@ export default function NotificationSettings() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center space-x-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate(-1)}
-          className="hover:bg-muted"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Ustawienia Powiadomień</h1>
-          <p className="text-muted-foreground">Zarządzaj powiadomieniami email, SMS i push</p>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-600 bg-clip-text text-transparent">
+            Ustawienia Powiadomień 🔔
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-2">
+            Zarządzaj powiadomieniami - funkcje w fazie rozwoju
+          </p>
         </div>
+        <Button
+          onClick={handleSaveSettings}
+          disabled={isSaving}
+          className="bg-emerald-500 hover:bg-emerald-600 text-white"
+        >
+          <Save className="w-4 h-4 mr-2" />
+          {isSaving ? "Zapisywanie..." : "Zapisz ustawienia"}
+        </Button>
       </div>
 
       {/* General Settings */}

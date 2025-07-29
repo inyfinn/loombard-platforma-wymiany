@@ -6,7 +6,7 @@ const Index = () => {
 
   useEffect(() => {
     // Przekieruj na dashboard jako główną stronę
-    navigate("/dashboard");
+    navigate("/dashboard", { replace: true });
   }, [navigate]);
 
   return null;

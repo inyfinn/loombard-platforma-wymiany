@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 interface UserProfile {
   name: string;
@@ -42,7 +43,9 @@ interface NewsItem {
 
 export default function Profile() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
+  const [originalProfile, setOriginalProfile] = useState<UserProfile | null>(null);
   const [profile, setProfile] = useState<UserProfile>({
     name: "Jan Kowalski",
     email: "jan.kowalski@example.com",
@@ -152,25 +155,60 @@ export default function Profile() {
     }
   };
 
+  const handleEditToggle = () => {
+    if (!isEditing) {
+      // Rozpocznij edycję - zapisz oryginalne dane
+      setOriginalProfile({ ...profile });
+      setIsEditing(true);
+    } else {
+      // Anuluj edycję - przywróć oryginalne dane
+      if (originalProfile) {
+        setProfile(originalProfile);
+      }
+      setIsEditing(false);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      // Symulacja zapisywania danych
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      toast({
+        title: "Profil zaktualizowany",
+        description: "Twoje dane zostały pomyślnie zapisane.",
+      });
+      
+      setIsEditing(false);
+      setOriginalProfile(null);
+    } catch (error) {
+      toast({
+        title: "Błąd zapisywania",
+        description: "Nie udało się zapisać zmian. Spróbuj ponownie.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center space-x-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate(-1)}
-          className="hover:bg-muted"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold">Mój Profil</h1>
-          <p className="text-muted-foreground">Centrum analityczne i ustawienia konta</p>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-600 bg-clip-text text-transparent">
+            Mój Profil 👤
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-2">
+            Centrum analityczne - funkcje w fazie rozwoju
+          </p>
         </div>
         <Button
           variant={isEditing ? "default" : "outline"}
-          onClick={() => setIsEditing(!isEditing)}
+          onClick={isEditing ? handleSave : handleEditToggle}
+          className={isEditing 
+            ? "bg-emerald-500 hover:bg-emerald-600 text-white" 
+            : "border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-950"
+          }
         >
           {isEditing ? (
             <>

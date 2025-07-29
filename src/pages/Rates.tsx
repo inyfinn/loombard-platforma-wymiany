@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Search, TrendingUp, TrendingDown, Plus, Minus, ArrowRightLeft, Activity, Globe, Clock, BarChart3, Sparkles } from "lucide-react";
+import { ArrowLeft, Search, TrendingUp, TrendingDown, Plus, Minus, ArrowRightLeft, Activity, Globe, Clock, BarChart3, Sparkles, DollarSign, ShoppingCart, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 interface CurrencyRate {
   pair: string;
@@ -21,10 +23,14 @@ interface CurrencyRate {
 
 export default function Rates() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCurrency, setFilterCurrency] = useState("");
   const [sortBy, setSortBy] = useState<"pair" | "rate" | "change" | "volume">("pair");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [showActionDialog, setShowActionDialog] = useState(false);
+  const [selectedAction, setSelectedAction] = useState<{type: string, pair: string, rate: number} | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Pełna lista walut ISO 4217
   const allCurrencies = [
@@ -155,88 +161,115 @@ export default function Rates() {
   const avgChange = rates.reduce((sum, rate) => sum + rate.change, 0) / rates.length;
   const activePairs = rates.length;
 
+  const handleActionClick = (type: string, pair: string, rate: number) => {
+    setSelectedAction({ type, pair, rate });
+    setShowActionDialog(true);
+  };
+
+  const handleConfirmAction = async () => {
+    if (!selectedAction) return;
+
+    setIsProcessing(true);
+    try {
+      // Symulacja procesowania akcji
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      const actionMessages = {
+        buy: `Zakup ${selectedAction.pair} został zlecony po kursie ${selectedAction.rate.toFixed(4)}`,
+        sell: `Sprzedaż ${selectedAction.pair} została zlecona po kursie ${selectedAction.rate.toFixed(4)}`,
+        exchange: `Wymiana ${selectedAction.pair} została zlecona po kursie ${selectedAction.rate.toFixed(4)}`
+      };
+
+      toast({
+        title: "Zlecenie utworzone",
+        description: actionMessages[selectedAction.type as keyof typeof actionMessages],
+      });
+
+      setShowActionDialog(false);
+      setSelectedAction(null);
+      
+      // Przekieruj do wymiany po chwili
+      setTimeout(() => {
+        navigate('/exchange');
+      }, 1500);
+    } catch (error) {
+      toast({
+        title: "Błąd zlecenia",
+        description: "Nie udało się utworzyć zlecenia. Spróbuj ponownie.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-        <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(-1)}
-            className="hover:bg-slate-100 dark:hover:bg-slate-800"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 dark:from-slate-100 dark:to-slate-400 bg-clip-text text-transparent">
-              Kursy Walut LIVE 📈
-            </h1>
-            <p className="text-lg text-slate-600 dark:text-slate-400">
-              Aktualne kursy wszystkich walut świata w czasie rzeczywistym
-            </p>
-          </div>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-600 bg-clip-text text-transparent">
+            Kursy LIVE 📊
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-2">
+            Dane w czasie rzeczywistym - funkcje w fazie rozwoju
+          </p>
         </div>
-        
-        {/* Live Status */}
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2 px-3 py-1 bg-green-50 dark:bg-green-900/20 rounded-full">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-green-700 dark:text-green-400">LIVE</span>
-          </div>
+        <div className="flex items-center space-x-3">
+          <Badge className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 px-3 py-1">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></div>
+            LIVE
+          </Badge>
           <Button
             variant="outline"
-            size="sm"
             onClick={() => navigate('/exchange')}
-            className="border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+            className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-950"
           >
-            <Sparkles className="w-4 h-4 mr-2" />
+            <ArrowRightLeft className="w-4 h-4 mr-2" />
             Szybka wymiana
           </Button>
         </div>
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100/50 border-blue-200/50 dark:from-blue-900/20 dark:to-blue-800/20 dark:border-blue-700/50">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950/50 dark:to-emerald-900/50 border-emerald-200 dark:border-emerald-800">
           <CardContent className="p-6">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
-                <Globe className="w-6 h-6 text-white" />
-              </div>
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Aktywne pary</p>
-                <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{activePairs}</p>
+                <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Aktywne pary</p>
+                <p className="text-2xl font-bold text-emerald-900 dark:text-emerald-100">24</p>
+              </div>
+              <div className="w-12 h-12 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-green-100/50 border-green-200/50 dark:from-green-900/20 dark:to-green-800/20 dark:border-green-700/50">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/50 border-blue-200 dark:border-blue-800">
           <CardContent className="p-6">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
-                <Activity className="w-6 h-6 text-white" />
-              </div>
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-green-600 dark:text-green-400">Średnia zmiana</p>
-                <p className="text-2xl font-bold text-green-900 dark:text-green-100">{avgChange.toFixed(2)}%</p>
+                <p className="text-sm font-medium text-blue-700 dark:text-blue-300">Średnia zmiana</p>
+                <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">+0.8%</p>
+              </div>
+              <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100/50 border-purple-200/50 dark:from-purple-900/20 dark:to-purple-800/20 dark:border-purple-700/50">
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/50 border-purple-200 dark:border-purple-800">
           <CardContent className="p-6">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-white" />
-              </div>
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-purple-600 dark:text-purple-400">Całkowity wolumen</p>
-                <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-                  {new Intl.NumberFormat('pl-PL', { notation: 'compact' }).format(totalVolume)}
-                </p>
+                <p className="text-sm font-medium text-purple-700 dark:text-purple-300">Łączny wolumen</p>
+                <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">2.4M PLN</p>
+              </div>
+              <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               </div>
             </div>
           </CardContent>
@@ -380,33 +413,32 @@ export default function Rates() {
                     <td className="p-4 text-center">
                       <div className="flex justify-center space-x-2">
                         <Button
-                          variant="outline"
                           size="sm"
-                          onClick={() => navigate('/exchange', { state: { action: 'buy', currency: rate.base } })}
-                          className="border-green-200 hover:bg-green-50 dark:border-green-800 dark:hover:bg-green-900/20"
+                          variant="outline"
+                          className="border-green-200 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-950"
+                          onClick={() => handleActionClick("buy", rate.pair, rate.rate)}
                         >
-                          <Plus className="w-3 h-3 text-green-600 dark:text-green-400" />
+                          <ShoppingCart className="w-3 h-3 mr-1" />
+                          Kup
                         </Button>
-                        {userHasCurrency(rate.base) && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => navigate('/exchange', { state: { action: 'sell', currency: rate.base } })}
-                            className="border-red-200 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-900/20"
-                          >
-                            <Minus className="w-3 h-3 text-red-600 dark:text-red-400" />
-                          </Button>
-                        )}
-                        {userHasCurrency(rate.base) && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => navigate('/exchange', { state: { action: 'exchange', currency: rate.base } })}
-                            className="border-blue-200 hover:bg-blue-50 dark:border-blue-800 dark:hover:bg-blue-900/20"
-                          >
-                            <ArrowRightLeft className="w-3 h-3 text-blue-600 dark:text-blue-400" />
-                          </Button>
-                        )}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-red-200 text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
+                          onClick={() => handleActionClick("sell", rate.pair, rate.rate)}
+                        >
+                          <CreditCard className="w-3 h-3 mr-1" />
+                          Sprzedaj
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-950"
+                          onClick={() => handleActionClick("exchange", rate.pair, rate.rate)}
+                        >
+                          <ArrowRightLeft className="w-3 h-3 mr-1" />
+                          Wymień
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -416,6 +448,69 @@ export default function Rates() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Action Dialog */}
+      <Dialog open={showActionDialog} onOpenChange={setShowActionDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              {selectedAction?.type === "buy" && <ShoppingCart className="w-5 h-5 text-green-500" />}
+              {selectedAction?.type === "sell" && <CreditCard className="w-5 h-5 text-red-500" />}
+              {selectedAction?.type === "exchange" && <ArrowRightLeft className="w-5 h-5 text-blue-500" />}
+              <span>
+                {selectedAction?.type === "buy" && "Zakup"}
+                {selectedAction?.type === "sell" && "Sprzedaż"}
+                {selectedAction?.type === "exchange" && "Wymiana"}
+              </span>
+            </DialogTitle>
+            <DialogDescription>
+              Potwierdź zlecenie dla pary {selectedAction?.pair} po kursie {selectedAction?.rate.toFixed(4)}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="p-4 bg-muted rounded-lg">
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Para walut:</span>
+                <span className="font-medium">{selectedAction?.pair}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Kurs:</span>
+                <span className="font-medium">{selectedAction?.rate.toFixed(4)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Typ zlecenia:</span>
+                <span className="font-medium">
+                  {selectedAction?.type === "buy" && "Zakup"}
+                  {selectedAction?.type === "sell" && "Sprzedaż"}
+                  {selectedAction?.type === "exchange" && "Wymiana"}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowActionDialog(false)}
+              disabled={isProcessing}
+            >
+              Anuluj
+            </Button>
+            <Button 
+              onClick={handleConfirmAction}
+              disabled={isProcessing}
+              className={
+                selectedAction?.type === "buy" ? "bg-green-500 hover:bg-green-600" :
+                selectedAction?.type === "sell" ? "bg-red-500 hover:bg-red-600" :
+                "bg-blue-500 hover:bg-blue-600"
+              }
+            >
+              {isProcessing ? "Przetwarzanie..." : "Potwierdź zlecenie"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
