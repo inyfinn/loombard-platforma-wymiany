@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Loombard Design System
+/* KANTOOR.pl Design System
 Zaawansowana platforma wymiany walut - estetyka zgodna z projektem MarketSpotter
 Główny kolor akcentu: #02c349 (zielony)
 Tło: #00071c (ciemny granat)
@@ -47,7 +47,7 @@ Tło: #00071c (ciemny granat)
 
     --radius: 0.75rem;
 
-    /* Loombard custom design tokens - jasny motyw */
+    /* KANTOOR.pl custom design tokens - jasny motyw */
     --gradient-primary: linear-gradient(135deg, hsl(140 98% 39%), hsl(140 98% 45%));
     --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(0 0% 98%));
     --gradient-accent: linear-gradient(135deg, hsl(140 98% 39%), hsl(140 98% 45%));
