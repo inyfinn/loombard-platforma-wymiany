@@ -5,9 +5,8 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  // Stała ścieżka bazowa – niezmienna dla builda i dev.
-  // Vite w trybie dev ignoruje "base", więc nie wpływa to na localhost.
-      base: "/kantoor-platforma-wymiany/",
+  // Base path tylko dla produkcji
+  base: mode === 'production' ? "/kantoor-platforma-wymiany/" : "/",
   server: {
     host: "::",
     port: 8080,
@@ -21,5 +20,10 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  build: {
+    outDir: "dist",
+    assetsDir: "assets",
+    sourcemap: mode === 'development',
   },
 }));

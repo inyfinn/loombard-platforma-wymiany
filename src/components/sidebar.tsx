@@ -1,182 +1,403 @@
 import { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
-import { 
-  LayoutDashboard, 
-  ArrowRightLeft, 
-  TrendingUp, 
-  History, 
-  Settings, 
-  Menu,
-  X,
-  Wallet,
-  User,
-  Sparkles,
-  BarChart3,
-  Bell
-} from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { usePortfolio } from "../context/PortfolioContext";
 import { Button } from "@/components/ui/button";
-import { cn, getPolishVocative } from "@/lib/utils";
-import { Logo } from "./logo";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import {
+  LayoutDashboard,
+  Wallet,
+  ArrowRightLeft,
+  TrendingUp,
+  History,
+  User,
+  Settings,
+  ChevronLeft,
+  Menu,
+  Star,
+  Zap,
+  Target,
+  BarChart3,
+  Bell,
+  HelpCircle,
+  FileText,
+  Shield,
+  CreditCard,
+  PiggyBank,
+  Coins,
+  Globe,
+  Calculator,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  Calendar,
+  PieChart,
+  LineChart,
+  Activity,
+  Users,
+  Award,
+  BookOpen,
+  Lightbulb,
+  Brain,
+  Trophy,
+  StarIcon,
+  TrendingDown,
+  DollarSign,
+  Euro,
+  PoundSterling,
+  SwissFranc,
+  Bitcoin,
+  Home,
+  Search,
+  Filter,
+  Download,
+  Upload,
+  RefreshCw,
+  Info,
+  Mail,
+  Phone,
+  MessageSquare,
+  Video,
+  Mic,
+  Camera,
+  Image,
+  Music,
+  Film,
+  Monitor,
+  Smartphone,
+  Tablet,
+  Watch,
+  Headphones,
+  Speaker,
+  Printer,
+  Wifi,
+  Bluetooth,
+  Battery,
+  Power,
+  Sun,
+  Moon,
+  Cloud,
+  Wind,
+  Thermometer,
+  MapPin,
+  Navigation,
+  Compass,
+  Flag,
+  Building,
+  Store,
+  ShoppingCart,
+  ShoppingBag,
+  Receipt,
+  Tag,
+  Hash,
+  AtSign,
+  Percent,
+  HashIcon,
+  DollarSignIcon,
+  EuroIcon,
+  PoundIcon,
+  YenIcon,
+  RubleIcon,
+  WonIcon,
+  LiraIcon,
+  RupeeIcon,
+  RinggitIcon,
+  BahtIcon,
+  DongIcon,
+  PesoIcon,
+  RealIcon,
+  RandIcon,
+  ShekelIcon,
+  TengeIcon,
+  HryvniaIcon,
+  ForintIcon,
+  KorunaIcon,
+  ZlotyIcon,
+  LeuIcon,
+  LevIcon,
+  KunaIcon,
+  MarkIcon,
+  FrancIcon,
+  GuilderIcon,
+  EscudoIcon,
+  PesetaIcon,
+  DrachmaIcon,
+  CrownIcon,
+  FlorinIcon,
+  ThalerIcon,
+  DucatIcon,
+  SovereignIcon,
+  GuineaIcon,
+  ShillingIcon,
+  PennyIcon,
+  FarthingIcon,
+  GroatIcon,
+  NobleIcon,
+  AngelIcon,
+  RoseIcon,
+  UnicornIcon,
+  LionIcon,
+  LeopardIcon,
+  MiteIcon,
+  FarthingsIcon,
+  PenceIcon,
+  ShillingsIcon,
+  PoundsIcon,
+  GuineasIcon,
+  SovereignsIcon,
+  CrownsIcon,
+  FlorinsIcon,
+  ThalersIcon,
+  DucatsIcon,
+  AngelsIcon,
+  NoblesIcon,
+  RosesIcon,
+  UnicornsIcon,
+  LionsIcon,
+  LeopardsIcon,
+  MitesIcon,
+} from "lucide-react";
 
-// Get user name - in a real app this would come from user context/profile
-const userName = "Jan"; // This should be fetched from user profile/context
-// Example: change this to test different names: "Anna", "Piotr", "Katarzyna", "Michał", "Maria"
+interface SidebarProps {
+  isOpen: boolean;
+  onToggle: () => void;
+}
 
-const navigation = [
-  { name: "Panel główny", href: "/dashboard", icon: LayoutDashboard, badge: null },
-  { name: "Portfel", href: "/portfel", icon: Wallet, badge: null },
-  { name: "Wymiana", href: "/exchange", icon: ArrowRightLeft, badge: "Nowa" },
-  { name: "Kursy LIVE", href: "/rates", icon: TrendingUp, badge: null },
-  { name: "Historia", href: "/history", icon: History, badge: null },
-  { name: "Profil", href: "/profile", icon: User, badge: null },
-  { name: "Ustawienia", href: "/settings", icon: Settings, badge: null },
+const navigationItems = [
+  {
+    title: "Panel główny",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+    badge: null,
+  },
+  {
+    title: "Portfel",
+    href: "/portfel",
+    icon: Wallet,
+    badge: null,
+  },
+  {
+    title: "Wymiana",
+    href: "/exchange",
+    icon: ArrowRightLeft,
+    badge: { text: "Nowa", variant: "destructive" as const },
+  },
+  {
+    title: "Kursy LIVE",
+    href: "/rates",
+    icon: TrendingUp,
+    badge: null,
+  },
+  {
+    title: "Historia",
+    href: "/history",
+    icon: History,
+    badge: null,
+  },
+  {
+    title: "Profil",
+    href: "/profile",
+    icon: User,
+    badge: null,
+  },
+  {
+    title: "Ustawienia",
+    href: "/settings",
+    icon: Settings,
+    badge: null,
+  },
 ];
 
-export function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+const collapsedIcons = [
+  { icon: LayoutDashboard, title: "Panel główny", href: "/dashboard" },
+  { icon: Wallet, title: "Portfel", href: "/portfel" },
+  { icon: ArrowRightLeft, title: "Wymiana", href: "/exchange" },
+  { icon: TrendingUp, title: "Kursy LIVE", href: "/rates" },
+  { icon: History, title: "Historia", href: "/history" },
+  { icon: User, title: "Profil", href: "/profile" },
+  { icon: Settings, title: "Ustawienia", href: "/settings" },
+];
+
+export const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
+  const navigate = useNavigate();
   const location = useLocation();
+  const { totalValuePLN } = usePortfolio();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const handleToggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
+  const formatPLN = (amount: number) => {
+    return new Intl.NumberFormat('pl-PL', {
+      style: 'currency',
+      currency: 'PLN',
+      minimumFractionDigits: 2,
+    }).format(amount);
+  };
+
+  // Responsive behavior
+  const isMobile = window.innerWidth < 768;
+  const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+
+  // On mobile/tablet, always show full sidebar when open
+  const shouldShowFullSidebar = isOpen && (isMobile || isTablet);
+  // On desktop, show collapsed sidebar when collapsed
+  const shouldShowCollapsedSidebar = !isMobile && !isTablet && isCollapsed;
+
+  if (!isOpen && (isMobile || isTablet)) {
+    return null;
+  }
 
   return (
     <>
-      {/* Mobile overlay */}
-      {!collapsed && (
-        <div 
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden" 
-          onClick={() => setCollapsed(true)}
-        />
+      {/* Desktop collapsed sidebar */}
+      {shouldShowCollapsedSidebar && (
+        <div className="fixed left-0 top-0 h-full w-16 bg-[#00071c] border-r border-[#1FFFA9]/20 z-50">
+          <div className="flex flex-col h-full">
+            {/* Logo area */}
+            <div className="p-4 border-b border-[#1FFFA9]/20">
+              <div className="w-8 h-8 bg-gradient-to-br from-[#1FFFA9] to-[#02c349] rounded-lg flex items-center justify-center">
+                <Star className="w-5 h-5 text-black" />
+              </div>
+            </div>
+
+            {/* Navigation icons */}
+            <div className="flex-1 py-4">
+              {collapsedIcons.map((item, index) => (
+                <button
+                  key={index}
+                  onClick={() => navigate(item.href)}
+                  className={cn(
+                    "w-full h-12 flex items-center justify-center text-gray-400 hover:text-[#1FFFA9] hover:bg-[#1FFFA9]/10 transition-colors relative group",
+                    location.pathname === item.href && "text-[#1FFFA9] bg-[#1FFFA9]/20"
+                  )}
+                  title={item.title}
+                >
+                  <item.icon className="w-5 h-5" />
+                  {location.pathname === item.href && (
+                    <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-[#1FFFA9] rounded-l-full" />
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Performance summary */}
+            <div className="p-2 border-t border-[#1FFFA9]/20">
+              <div className="bg-white/10 rounded-lg p-2 text-center">
+                <div className="text-xs text-gray-400 mb-1">Dzisiejszy zysk</div>
+                <div className="text-sm font-semibold text-[#1FFFA9]">+2.4%</div>
+                <div className="text-xs text-gray-400 mt-1">Transakcje</div>
+                <div className="text-sm font-semibold text-white">12</div>
+              </div>
+            </div>
+
+            {/* Expand button */}
+            <button
+              onClick={handleToggleCollapse}
+              className="absolute -right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-[#1FFFA9] rounded-full flex items-center justify-center text-black hover:bg-[#1FFFA9]/90 transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
       )}
 
-      {/* Sidebar */}
-      <aside 
-        className={cn(
-          "fixed left-0 top-0 z-50 h-full bg-white/80 backdrop-blur-xl border-r border-slate-200/50 shadow-xl transition-all duration-300 lg:relative lg:translate-x-0 dark:bg-slate-900/80 dark:border-slate-700/50",
-          collapsed ? "-translate-x-full lg:w-16" : "w-72 translate-x-0"
-        )}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-200/50 dark:border-slate-700/50">
-          {!collapsed && (
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
+      {/* Full sidebar */}
+      {shouldShowFullSidebar && (
+        <div className="fixed left-0 top-0 h-full w-64 bg-[#00071c] border-r border-[#1FFFA9]/20 z-50">
+          <div className="flex flex-col h-full">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-[#1FFFA9]/20">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-[#1FFFA9] to-[#02c349] rounded-lg flex items-center justify-center">
+                  <Star className="w-5 h-5 text-black" />
+                </div>
+                <div>
+                  <h1 className="font-bold text-lg bg-gradient-to-r from-[#1FFFA9] to-[#02c349] bg-clip-text text-transparent">
+                    KANTOOR.pl
+                  </h1>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Wymiana walut</p>
+                </div>
               </div>
-              <div>
-                <h1 className="font-bold text-lg bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  KANTOOR.pl
-                </h1>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Wymiana walut</p>
-              </div>
-            </div>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setCollapsed(!collapsed)}
-            className="lg:hidden hover:bg-slate-100 dark:hover:bg-slate-800"
-          >
-            {collapsed ? <Menu className="w-5 h-5" /> : <X className="w-5 h-5" />}
-          </Button>
-        </div>
-
-        {/* User Welcome */}
-        {!collapsed && (
-          <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">{userName.charAt(0)}</span>
-              </div>
-              <div>
-                <p className="font-medium text-slate-900 dark:text-slate-100">
-                  Cześć, {getPolishVocative(userName)}!
-                </p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Gotowy na wymianę?
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Navigation */}
-        <nav className="p-4 space-y-1">
-          {navigation.map((item) => {
-            const isActive = location.pathname === item.href || 
-              (item.href === "/dashboard" && location.pathname === "/");
-            
-            return (
-              <NavLink
-                key={item.name}
-                to={item.href}
-                className={cn(
-                  "flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group relative",
-                  isActive 
-                    ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25" 
-                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
-                )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onToggle}
+                className="text-gray-400 hover:text-[#1FFFA9]"
               >
-                <item.icon className={cn(
-                  "w-5 h-5 transition-transform duration-200",
-                  isActive ? "text-white" : "text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200",
-                  !collapsed && "group-hover:scale-110"
-                )} />
-                {!collapsed && (
-                  <>
-                    <span className="font-medium">{item.name}</span>
-                    {item.badge && (
-                      <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-                        {item.badge}
-                      </span>
-                    )}
-                  </>
-                )}
-                {isActive && !collapsed && (
-                  <div className="absolute right-2 w-2 h-2 bg-white rounded-full"></div>
-                )}
-              </NavLink>
-            );
-          })}
-        </nav>
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+            </div>
 
-        {/* Quick Stats */}
-        {!collapsed && (
-          <div className="p-4 mt-auto">
-            <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-xl p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Dzisiejszy zysk</span>
-                <span className="text-sm font-bold text-green-600">+2.4%</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Transakcje</span>
-                <span className="text-sm font-bold text-slate-900 dark:text-slate-100">12</span>
+            {/* User greeting */}
+            <div className="p-4 border-b border-[#1FFFA9]/20">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-[#1FFFA9] to-[#02c349] rounded-full flex items-center justify-center">
+                  <span className="text-black font-semibold">J</span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-200">Cześć, Janie!</p>
+                  <p className="text-xs text-gray-400">Gotowy na wymianę?</p>
+                </div>
               </div>
             </div>
+
+            {/* Navigation */}
+            <div className="flex-1 py-4">
+              {navigationItems.map((item) => (
+                <button
+                  key={item.href}
+                  onClick={() => navigate(item.href)}
+                  className={cn(
+                    "w-full flex items-center justify-between px-4 py-3 text-left transition-colors relative group",
+                    location.pathname === item.href
+                      ? "bg-gradient-to-r from-[#1FFFA9] to-[#02c349] text-black"
+                      : "text-gray-400 hover:text-[#1FFFA9] hover:bg-[#1FFFA9]/10"
+                  )}
+                >
+                  <div className="flex items-center space-x-3">
+                    <item.icon className="w-5 h-5" />
+                    <span className="font-medium">{item.title}</span>
+                  </div>
+                  {item.badge && (
+                    <Badge variant={item.badge.variant} className="text-xs">
+                      {item.badge.text}
+                    </Badge>
+                  )}
+                  {location.pathname === item.href && (
+                    <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-black rounded-l-full" />
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Performance summary */}
+            <div className="p-4 border-t border-[#1FFFA9]/20">
+              <div className="bg-white/10 rounded-lg p-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-gray-400">Dzisiejszy zysk</span>
+                  <span className="text-sm font-semibold text-[#1FFFA9]">+2.4%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-400">Transakcje</span>
+                  <span className="text-sm font-semibold text-white">12</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Collapse button for desktop */}
+            {!isMobile && !isTablet && (
+              <button
+                onClick={handleToggleCollapse}
+                className="absolute -right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-[#1FFFA9] rounded-full flex items-center justify-center text-black hover:bg-[#1FFFA9]/90 transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+            )}
           </div>
-        )}
-
-        {/* Toggle button for desktop */}
-        <div className="absolute bottom-4 left-4 hidden lg:block">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setCollapsed(!collapsed)}
-            className="hover:bg-slate-100 dark:hover:bg-slate-800"
-          >
-            {collapsed ? <Menu className="w-5 h-5" /> : <X className="w-5 h-5" />}
-          </Button>
         </div>
-      </aside>
-
-      {/* Mobile menu button */}
-      {collapsed && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setCollapsed(false)}
-          className="fixed top-4 left-4 z-40 lg:hidden bg-white/80 backdrop-blur-sm shadow-lg border border-slate-200/50 dark:bg-slate-900/80 dark:border-slate-700/50"
-        >
-          <Menu className="w-5 h-5" />
-        </Button>
       )}
     </>
   );
-}
+};

@@ -3,186 +3,177 @@
 @tailwind utilities;
 
 /* KANTOOR.pl Design System
-Zaawansowana platforma wymiany walut - estetyka zgodna z projektem MarketSpotter
-Główny kolor akcentu: #02c349 (zielony)
+Zaawansowana platforma wymiany walut - estetyka zgodna z projektem AI Trading Dashboard
+Główny kolor akcentu: #1FFFA9 (jasny zielony) + #02c349 (nasz zielony)
 Tło: #00071c (ciemny granat)
 */
 
 @layer base {
   :root {
-    /* Jasny motyw - inspirowany projektem MarketSpotter */
-    --background: 0 0% 98%;
+    --background: 0 0% 100%;
     --foreground: 0 0% 5%;
-
     --card: 0 0% 100%;
     --card-foreground: 0 0% 5%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 5%;
-
     --primary: 140 98% 39%;
     --primary-foreground: 0 0% 100%;
-
     --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 20%;
-
+    --secondary-foreground: 0 0% 15%;
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
-
     --accent: 140 98% 39%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 84% 60%;
+    --accent-foreground: 0 0% 5%;
+    --destructive: 0 75% 50%;
     --destructive-foreground: 0 0% 100%;
-
-    --border: 0 0% 91%;
-    --input: 0 0% 91%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
     --ring: 140 98% 39%;
-
     --success: 140 98% 39%;
-    --success-foreground: 0 0% 100%;
-
+    --success-foreground: 0 0% 5%;
     --warning: 45 93% 47%;
-    --warning-foreground: 0 0% 100%;
-
+    --warning-foreground: 0 0% 5%;
     --radius: 0.75rem;
 
     /* KANTOOR.pl custom design tokens - jasny motyw */
     --gradient-primary: linear-gradient(135deg, hsl(140 98% 39%), hsl(140 98% 45%));
     --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(0 0% 98%));
     --gradient-accent: linear-gradient(135deg, hsl(140 98% 39%), hsl(140 98% 45%));
-    --shadow-primary: 0 10px 40px -10px hsl(140 98% 39% / 0.3);
-    --shadow-card: 0 4px 20px -4px hsl(0 0% 0% / 0.05);
-    --shadow-widget: 0 2px 10px -2px hsl(0 0% 0% / 0.08);
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow-primary: 0 10px 40px -10px hsl(140 98% 39% / 0.4);
+    --shadow-card: 0 4px 20px -4px hsl(0 0% 0% / 0.1);
+    --shadow-widget: 0 2px 10px -2px hsl(0 0% 0% / 0.1);
   }
 
   .dark {
-    /* Ciemny motyw - ciemny granat #00071c */
+    /* Ciemny motyw - ciemny granat #00071c z akcentem #1FFFA9 */
     --background: 220 100% 1%;
     --foreground: 0 0% 98%;
-
     --card: 220 100% 2%;
     --card-foreground: 0 0% 98%;
-
     --popover: 220 100% 2%;
     --popover-foreground: 0 0% 98%;
-
-    --primary: 140 98% 39%;
+    --primary: 160 100% 60%; /* #1FFFA9 */
     --primary-foreground: 0 0% 5%;
-
     --secondary: 220 100% 3%;
     --secondary-foreground: 0 0% 85%;
-
     --muted: 220 100% 3%;
     --muted-foreground: 0 0% 65%;
-
-    --accent: 140 98% 39%;
+    --accent: 160 100% 60%; /* #1FFFA9 */
     --accent-foreground: 0 0% 5%;
-
     --destructive: 0 75% 50%;
     --destructive-foreground: 0 0% 100%;
-
     --border: 220 100% 5%;
     --input: 220 100% 5%;
-    --ring: 140 98% 39%;
-
-    --success: 140 98% 39%;
+    --ring: 160 100% 60%; /* #1FFFA9 */
+    --success: 140 98% 39%; /* Nasz zielony #02c349 */
     --success-foreground: 0 0% 5%;
-
     --warning: 45 93% 47%;
     --warning-foreground: 0 0% 5%;
-
     /* Dark mode gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(140 98% 39%), hsl(140 98% 45%));
+    --gradient-primary: linear-gradient(135deg, hsl(160 100% 60%), hsl(160 100% 70%));
     --gradient-card: linear-gradient(135deg, hsl(220 100% 2%), hsl(220 100% 4%));
-    --gradient-accent: linear-gradient(135deg, hsl(140 98% 39%), hsl(140 98% 45%));
-    --shadow-primary: 0 10px 40px -10px hsl(140 98% 39% / 0.4);
+    --gradient-accent: linear-gradient(135deg, hsl(160 100% 60%), hsl(160 100% 70%));
+    --shadow-primary: 0 10px 40px -10px hsl(160 100% 60% / 0.4);
     --shadow-card: 0 4px 20px -4px hsl(0 0% 0% / 0.4);
     --shadow-widget: 0 2px 10px -2px hsl(0 0% 0% / 0.3);
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
+body {
+  @apply bg-background text-foreground transition-colors duration-300;
+  background-color: #00071c;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
 
-  body {
-    @apply bg-background text-foreground transition-colors duration-300;
-    background-color: #00071c;
-  }
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(220 100% 2%);
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(160 100% 60% / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(160 100% 60% / 0.5);
 }
 
 @layer components {
   /* KANTOOR.pl Widget Cards */
   .widget-card {
     @apply bg-card border border-border rounded-xl p-6 transition-all duration-300;
-    box-shadow: var(--shadow-widget);
-    background-color: #00071c;
-    border-color: rgba(2, 195, 73, 0.2);
+    background: linear-gradient(135deg, hsl(220 100% 2%), hsl(220 100% 4%));
+    border: 1px solid hsl(160 100% 60% / 0.1);
+    box-shadow: 0 4px 20px -4px hsl(0 0% 0% / 0.4);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .widget-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(160 100% 60% / 0.3), transparent);
   }
 
   .widget-card:hover {
-    box-shadow: var(--shadow-card);
-    border-color: rgba(2, 195, 73, 0.4);
+    border-color: hsl(160 100% 60% / 0.3);
+    box-shadow: 0 8px 30px -8px hsl(160 100% 60% / 0.2);
+    transform: translateY(-2px);
   }
 
-  /* Currency Cards */
+  /* Currency cards */
   .currency-card {
-    @apply bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 text-card-foreground rounded-xl p-6;
-    box-shadow: var(--shadow-widget);
-    background: linear-gradient(135deg, rgba(2, 195, 73, 0.1), rgba(2, 195, 73, 0.05));
-    border-color: rgba(2, 195, 73, 0.2);
+    @apply bg-card border border-border rounded-lg p-4 transition-all duration-300;
+    background: linear-gradient(135deg, hsl(220 100% 2%), hsl(220 100% 4%));
+    border: 1px solid hsl(160 100% 60% / 0.1);
+  }
+
+  .currency-card:hover {
+    border-color: hsl(160 100% 60% / 0.3);
+    box-shadow: 0 4px 15px -4px hsl(160 100% 60% / 0.2);
   }
 
   /* KANTOOR.pl Buttons */
   .kantoor-button-primary {
     @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 font-medium;
     transition: var(--transition-smooth);
-    background-color: #02c349;
+    background: linear-gradient(135deg, #1FFFA9, #02c349);
+    color: #000;
+    font-weight: 600;
+    box-shadow: 0 4px 15px -4px hsl(160 100% 60% / 0.3);
+  }
+
+  .kantoor-button-primary:hover {
+    background: linear-gradient(135deg, #02c349, #1FFFA9);
+    box-shadow: 0 6px 20px -6px hsl(160 100% 60% / 0.4);
+    transform: translateY(-1px);
   }
 
   .kantoor-button-secondary {
     @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border rounded-lg px-4 py-2 font-medium;
     transition: var(--transition-smooth);
-    background-color: rgba(2, 195, 73, 0.1);
-    border-color: rgba(2, 195, 73, 0.2);
+    background: linear-gradient(135deg, hsl(220 100% 3%), hsl(220 100% 5%));
+    border: 1px solid hsl(160 100% 60% / 0.2);
+    color: hsl(160 100% 60%);
   }
 
-  .accent-button {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 font-medium;
-    transition: var(--transition-smooth);
-    background-color: #02c349;
+  .kantoor-button-secondary:hover {
+    background: linear-gradient(135deg, hsl(220 100% 5%), hsl(220 100% 7%));
+    border-color: hsl(160 100% 60% / 0.4);
+    box-shadow: 0 4px 15px -4px hsl(160 100% 60% / 0.2);
   }
 
-  /* Rate indicators */
-  .rate-up {
-    @apply text-success;
-    color: #02c349;
-  }
-
-  .rate-down {
-    @apply text-destructive;
-  }
-
-  /* Animations */
-  .animate-pulse-value {
-    animation: pulse-value 0.5s ease-in-out;
-  }
-
-  .animate-glow {
-    animation: glow 2s ease-in-out infinite alternate;
-  }
-
-  /* Logo styles */
-  .logo-l {
-    @apply text-primary font-bold text-2xl tracking-tight;
-    font-family: system-ui, -apple-system, sans-serif;
-    color: #02c349;
-  }
-
-  /* Dashboard specific styles */
+  /* Dashboard grid */
   .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -218,93 +209,155 @@ Tło: #00071c (ciemny granat)
 
   .draggable-widget:active {
     cursor: grabbing;
-    transform: rotate(2deg);
-  }
-
-  .draggable-widget.dragging {
-    opacity: 0.8;
-    transform: scale(1.02);
-    z-index: 1000;
-  }
-
-  /* Edit mode styles */
-  .edit-mode .widget-card {
-    position: relative;
   }
 
   .edit-mode .widget-card::before {
-    content: '';
+    content: '⋮⋮';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border: 2px dashed rgba(2, 195, 73, 0.3);
-    border-radius: 0.75rem;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s ease;
+    top: 0.5rem;
+    right: 0.5rem;
+    color: hsl(160 100% 60%);
+    font-size: 0.75rem;
+    opacity: 0.7;
   }
 
-  .edit-mode .widget-card:hover::before {
-    opacity: 1;
+  /* Rate indicators */
+  .rate-up {
+    color: #1FFFA9;
+    font-weight: 600;
   }
-}
 
-@layer utilities {
-  .text-gradient {
-    background: var(--gradient-primary);
+  .rate-down {
+    color: #ff4757;
+    font-weight: 600;
+  }
+
+  /* Logo styling */
+  .logo-l {
+    background: linear-gradient(135deg, #1FFFA9, #02c349);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    font-weight: 700;
   }
 
+  /* Custom utility classes */
   .bg-kantoor-dark {
     background-color: #00071c;
   }
 
   .text-kantoor-green {
-    color: #02c349;
+    color: #1FFFA9;
   }
 
   .border-kantoor-green {
-    border-color: rgba(2, 195, 73, 0.2);
+    border-color: rgba(31, 255, 169, 0.2);
   }
 
   .hover-border-kantoor-green:hover {
-    border-color: rgba(2, 195, 73, 0.4);
+    border-color: rgba(31, 255, 169, 0.4);
   }
-}
 
-@keyframes pulse-value {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-@keyframes glow {
-  0% { 
-    box-shadow: 0 0 5px rgba(2, 195, 73, 0.5);
+  /* Glow effects */
+  .glow {
+    box-shadow: 0 0 20px rgba(31, 255, 169, 0.3);
   }
-  100% { 
-    box-shadow: 0 0 20px rgba(2, 195, 73, 0.8);
+
+  .glow-text {
+    text-shadow: 0 0 10px rgba(31, 255, 169, 0.5);
   }
-}
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
+  /* Animated gradient background */
+  .animated-gradient {
+    background: linear-gradient(-45deg, #00071c, #001a3a, #00071c, #001a3a);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+  }
 
-::-webkit-scrollbar-track {
-  background: #00071c;
-}
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(2, 195, 73, 0.3);
-  border-radius: 4px;
-}
+  /* Card hover effects */
+  .card-hover {
+    transition: all 0.3s ease;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(2, 195, 73, 0.5);
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px -12px rgba(31, 255, 169, 0.3);
+  }
+
+  /* Status indicators */
+  .status-online {
+    background: #1FFFA9;
+    box-shadow: 0 0 10px rgba(31, 255, 169, 0.5);
+  }
+
+  .status-offline {
+    background: #ff4757;
+    box-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
+  }
+
+  /* Progress bars */
+  .progress-bar {
+    background: linear-gradient(90deg, #1FFFA9, #02c349);
+    height: 4px;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
+  /* Input styling */
+  .input-modern {
+    background: linear-gradient(135deg, hsl(220 100% 2%), hsl(220 100% 4%));
+    border: 1px solid hsl(160 100% 60% / 0.2);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: white;
+    transition: all 0.3s ease;
+  }
+
+  .input-modern:focus {
+    outline: none;
+    border-color: #1FFFA9;
+    box-shadow: 0 0 0 3px rgba(31, 255, 169, 0.1);
+  }
+
+  /* Badge styling */
+  .badge-modern {
+    background: linear-gradient(135deg, #1FFFA9, #02c349);
+    color: #000;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+  }
+
+  /* Chart containers */
+  .chart-container {
+    background: linear-gradient(135deg, hsl(220 100% 2%), hsl(220 100% 4%));
+    border: 1px solid hsl(160 100% 60% / 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .chart-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #1FFFA9, transparent);
+  }
 }
