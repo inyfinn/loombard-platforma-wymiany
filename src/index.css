@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 /* KANTOOR.pl Design System
-Zaawansowana platforma wymiany walut - estetyka zgodna z projektem AI Trading Dashboard
-Główny kolor akcentu: #1FFFA9 (jasny zielony) + #02c349 (nasz zielony)
+Zaawansowana platforma wymiany walut - piękny ciemny motyw
+Główny kolor akcentu: #2cff79 (jasny zielony) + #02c349 (nasz zielony)
 Tło: #00071c (ciemny granat)
 */
 
@@ -45,35 +45,35 @@ Tło: #00071c (ciemny granat)
   }
 
   .dark {
-    /* Ciemny motyw - ciemny granat #00071c z akcentem #1FFFA9 */
+    /* Ciemny motyw - ciemny granat #00071c z akcentem #2cff79 */
     --background: 220 100% 1%;
     --foreground: 0 0% 98%;
     --card: 220 100% 2%;
     --card-foreground: 0 0% 98%;
     --popover: 220 100% 2%;
     --popover-foreground: 0 0% 98%;
-    --primary: 160 100% 60%; /* #1FFFA9 */
+    --primary: 142 100% 60%; /* #2cff79 */
     --primary-foreground: 0 0% 5%;
     --secondary: 220 100% 3%;
     --secondary-foreground: 0 0% 85%;
     --muted: 220 100% 3%;
     --muted-foreground: 0 0% 65%;
-    --accent: 160 100% 60%; /* #1FFFA9 */
+    --accent: 142 100% 60%; /* #2cff79 */
     --accent-foreground: 0 0% 5%;
     --destructive: 0 75% 50%;
     --destructive-foreground: 0 0% 100%;
     --border: 220 100% 5%;
     --input: 220 100% 5%;
-    --ring: 160 100% 60%; /* #1FFFA9 */
+    --ring: 142 100% 60%; /* #2cff79 */
     --success: 140 98% 39%; /* Nasz zielony #02c349 */
     --success-foreground: 0 0% 5%;
     --warning: 45 93% 47%;
     --warning-foreground: 0 0% 5%;
     /* Dark mode gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(160 100% 60%), hsl(160 100% 70%));
+    --gradient-primary: linear-gradient(135deg, hsl(142 100% 60%), hsl(142 100% 70%));
     --gradient-card: linear-gradient(135deg, hsl(220 100% 2%), hsl(220 100% 4%));
-    --gradient-accent: linear-gradient(135deg, hsl(160 100% 60%), hsl(160 100% 70%));
-    --shadow-primary: 0 10px 40px -10px hsl(160 100% 60% / 0.4);
+    --gradient-accent: linear-gradient(135deg, hsl(142 100% 60%), hsl(142 100% 70%));
+    --shadow-primary: 0 10px 40px -10px hsl(142 100% 60% / 0.4);
     --shadow-card: 0 4px 20px -4px hsl(0 0% 0% / 0.4);
     --shadow-widget: 0 2px 10px -2px hsl(0 0% 0% / 0.3);
   }
@@ -96,268 +96,301 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(160 100% 60% / 0.3);
+  background: hsl(142 100% 60% / 0.3);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(160 100% 60% / 0.5);
+  background: hsl(142 100% 60% / 0.5);
 }
 
-@layer components {
-  /* KANTOOR.pl Widget Cards */
-  .widget-card {
-    @apply bg-card border border-border rounded-xl p-6 transition-all duration-300;
-    background: linear-gradient(135deg, hsl(220 100% 2%), hsl(220 100% 4%));
-    border: 1px solid hsl(160 100% 60% / 0.1);
-    box-shadow: 0 4px 20px -4px hsl(0 0% 0% / 0.4);
-    position: relative;
-    overflow: hidden;
-  }
+/* KANTOOR.pl Widget Cards */
+.widget-card {
+  background: linear-gradient(135deg, rgba(0, 7, 28, 0.8), rgba(0, 7, 28, 0.6));
+  border: 1px solid rgba(44, 255, 121, 0.2);
+  box-shadow: 0 8px 32px rgba(44, 255, 121, 0.1);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
 
-  .widget-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, hsl(160 100% 60% / 0.3), transparent);
-  }
+.widget-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #2cff79, #02c349);
+  opacity: 0.8;
+}
 
-  .widget-card:hover {
-    border-color: hsl(160 100% 60% / 0.3);
-    box-shadow: 0 8px 30px -8px hsl(160 100% 60% / 0.2);
-    transform: translateY(-2px);
-  }
+.widget-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(44, 255, 121, 0.2);
+  border-color: rgba(44, 255, 121, 0.4);
+}
 
-  /* Currency cards */
-  .currency-card {
-    @apply bg-card border border-border rounded-lg p-4 transition-all duration-300;
-    background: linear-gradient(135deg, hsl(220 100% 2%), hsl(220 100% 4%));
-    border: 1px solid hsl(160 100% 60% / 0.1);
-  }
+/* Currency cards */
+.currency-card {
+  background: linear-gradient(135deg, rgba(0, 7, 28, 0.9), rgba(0, 7, 28, 0.7));
+  border: 1px solid rgba(44, 255, 121, 0.15);
+  transition: all 0.3s ease;
+}
 
-  .currency-card:hover {
-    border-color: hsl(160 100% 60% / 0.3);
-    box-shadow: 0 4px 15px -4px hsl(160 100% 60% / 0.2);
-  }
+.currency-card:hover {
+  border-color: rgba(44, 255, 121, 0.4);
+  box-shadow: 0 8px 25px rgba(44, 255, 121, 0.15);
+}
 
-  /* KANTOOR.pl Buttons */
-  .kantoor-button-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 font-medium;
-    transition: var(--transition-smooth);
-    background: linear-gradient(135deg, #1FFFA9, #02c349);
-    color: #000;
-    font-weight: 600;
-    box-shadow: 0 4px 15px -4px hsl(160 100% 60% / 0.3);
-  }
+/* KANTOOR.pl Buttons */
+.kantoor-button-primary {
+  background: linear-gradient(135deg, #2cff79, #02c349);
+  color: #000;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(44, 255, 121, 0.3);
+  transition: all 0.3s ease;
+}
 
-  .kantoor-button-primary:hover {
-    background: linear-gradient(135deg, #02c349, #1FFFA9);
-    box-shadow: 0 6px 20px -6px hsl(160 100% 60% / 0.4);
-    transform: translateY(-1px);
-  }
+.kantoor-button-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(44, 255, 121, 0.4);
+}
 
-  .kantoor-button-secondary {
-    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border rounded-lg px-4 py-2 font-medium;
-    transition: var(--transition-smooth);
-    background: linear-gradient(135deg, hsl(220 100% 3%), hsl(220 100% 5%));
-    border: 1px solid hsl(160 100% 60% / 0.2);
-    color: hsl(160 100% 60%);
-  }
+.kantoor-button-secondary {
+  background: linear-gradient(135deg, rgba(44, 255, 121, 0.1), rgba(2, 195, 73, 0.1));
+  border: 1px solid rgba(44, 255, 121, 0.3);
+  color: #2cff79;
+  transition: all 0.3s ease;
+}
 
-  .kantoor-button-secondary:hover {
-    background: linear-gradient(135deg, hsl(220 100% 5%), hsl(220 100% 7%));
-    border-color: hsl(160 100% 60% / 0.4);
-    box-shadow: 0 4px 15px -4px hsl(160 100% 60% / 0.2);
-  }
+.kantoor-button-secondary:hover {
+  background: linear-gradient(135deg, rgba(44, 255, 121, 0.2), rgba(2, 195, 73, 0.2));
+  border-color: rgba(44, 255, 121, 0.5);
+}
 
-  /* Dashboard grid */
-  .dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    padding: 1.5rem;
-  }
+/* Dashboard grid */
+.dashboard-grid {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(0, 7, 28, 0.95), rgba(0, 7, 28, 0.85));
+}
 
-  .widget-1x1 {
-    grid-column: span 1;
-    grid-row: span 1;
-  }
+.widget-1x1 { grid-column: span 1; grid-row: span 1; }
+.widget-1x2 { grid-column: span 1; grid-row: span 2; }
+.widget-2x1 { grid-column: span 2; grid-row: span 1; }
+.widget-2x2 { grid-column: span 2; grid-row: span 2; }
 
-  .widget-1x2 {
-    grid-column: span 1;
-    grid-row: span 2;
-  }
+/* Draggable widgets */
+.draggable-widget {
+  cursor: grab;
+  transition: all 0.2s ease;
+}
 
-  .widget-2x1 {
-    grid-column: span 2;
-    grid-row: span 1;
-  }
+.draggable-widget:active {
+  cursor: grabbing;
+  transform: scale(0.98);
+}
 
-  .widget-2x2 {
-    grid-column: span 2;
-    grid-row: span 2;
-  }
+/* Edit mode drag handle */
+.edit-mode .widget-card::before {
+  content: '⋮⋮';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: #2cff79;
+  font-size: 12px;
+  cursor: grab;
+  z-index: 10;
+}
 
-  /* Drag and drop styles */
-  .draggable-widget {
-    cursor: grab;
-    transition: all 0.2s ease;
-  }
+/* Rate indicators */
+.rate-up {
+  color: #2cff79;
+}
 
-  .draggable-widget:active {
-    cursor: grabbing;
-  }
+.rate-down {
+  color: #ff4757;
+}
 
-  .edit-mode .widget-card::before {
-    content: '⋮⋮';
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    color: hsl(160 100% 60%);
-    font-size: 0.75rem;
-    opacity: 0.7;
-  }
+/* Logo styling */
+.logo-l {
+  background: linear-gradient(135deg, #2cff79, #02c349);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-  /* Rate indicators */
-  .rate-up {
-    color: #1FFFA9;
-    font-weight: 600;
-  }
+/* Utility classes */
+.bg-kantoor-dark {
+  background-color: #00071c;
+}
 
-  .rate-down {
-    color: #ff4757;
-    font-weight: 600;
-  }
+.text-kantoor-green {
+  color: rgba(44, 255, 121, 1);
+}
 
-  /* Logo styling */
-  .logo-l {
-    background: linear-gradient(135deg, #1FFFA9, #02c349);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-weight: 700;
-  }
+.border-kantoor-green {
+  border-color: rgba(44, 255, 121, 0.3);
+}
 
-  /* Custom utility classes */
-  .bg-kantoor-dark {
-    background-color: #00071c;
-  }
+.hover-border-kantoor-green:hover {
+  border-color: rgba(44, 255, 121, 0.6);
+}
 
-  .text-kantoor-green {
-    color: #1FFFA9;
-  }
+/* Glow effects */
+.glow {
+  box-shadow: 0 0 20px rgba(44, 255, 121, 0.3);
+}
 
-  .border-kantoor-green {
-    border-color: rgba(31, 255, 169, 0.2);
-  }
+.glow-text {
+  text-shadow: 0 0 10px rgba(44, 255, 121, 0.5);
+}
 
-  .hover-border-kantoor-green:hover {
-    border-color: rgba(31, 255, 169, 0.4);
-  }
+/* Animated gradient */
+.animated-gradient {
+  background: linear-gradient(45deg, #2cff79, #02c349, #2cff79);
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+}
 
-  /* Glow effects */
-  .glow {
-    box-shadow: 0 0 20px rgba(31, 255, 169, 0.3);
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
   }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
 
-  .glow-text {
-    text-shadow: 0 0 10px rgba(31, 255, 169, 0.5);
-  }
+/* Card hover effects */
+.card-hover {
+  transition: all 0.3s ease;
+}
 
-  /* Animated gradient background */
-  .animated-gradient {
-    background: linear-gradient(-45deg, #00071c, #001a3a, #00071c, #001a3a);
-    background-size: 400% 400%;
-    animation: gradientShift 15s ease infinite;
-  }
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(44, 255, 121, 0.2);
+}
 
-  @keyframes gradientShift {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
+/* Status indicators */
+.status-online {
+  background: #2cff79;
+  box-shadow: 0 0 10px rgba(44, 255, 121, 0.5);
+}
 
-  /* Card hover effects */
-  .card-hover {
-    transition: all 0.3s ease;
-  }
+.status-offline {
+  background: #ff4757;
+  box-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
+}
 
-  .card-hover:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px -12px rgba(31, 255, 169, 0.3);
-  }
+/* Progress bar */
+.progress-bar {
+  background: linear-gradient(90deg, #2cff79, #02c349);
+  box-shadow: 0 0 10px rgba(44, 255, 121, 0.3);
+}
 
-  /* Status indicators */
-  .status-online {
-    background: #1FFFA9;
-    box-shadow: 0 0 10px rgba(31, 255, 169, 0.5);
-  }
+/* Modern input styling */
+.input-modern {
+  background: rgba(0, 7, 28, 0.8);
+  border: 1px solid rgba(44, 255, 121, 0.2);
+  backdrop-filter: blur(10px);
+}
 
-  .status-offline {
-    background: #ff4757;
-    box-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
-  }
+.input-modern:focus {
+  border-color: rgba(44, 255, 121, 0.6);
+  box-shadow: 0 0 0 3px rgba(44, 255, 121, 0.1);
+}
 
-  /* Progress bars */
-  .progress-bar {
-    background: linear-gradient(90deg, #1FFFA9, #02c349);
-    height: 4px;
-    border-radius: 2px;
-    transition: width 0.3s ease;
-  }
+/* Modern badge */
+.badge-modern {
+  background: linear-gradient(135deg, rgba(44, 255, 121, 0.2), rgba(2, 195, 73, 0.2));
+  border: 1px solid rgba(44, 255, 121, 0.3);
+  color: #2cff79;
+}
 
-  /* Input styling */
-  .input-modern {
-    background: linear-gradient(135deg, hsl(220 100% 2%), hsl(220 100% 4%));
-    border: 1px solid hsl(160 100% 60% / 0.2);
-    border-radius: 8px;
-    padding: 12px 16px;
-    color: white;
-    transition: all 0.3s ease;
-  }
+/* Chart container */
+.chart-container {
+  background: linear-gradient(135deg, rgba(0, 7, 28, 0.9), rgba(0, 7, 28, 0.7));
+  border: 1px solid rgba(44, 255, 121, 0.2);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
 
-  .input-modern:focus {
-    outline: none;
-    border-color: #1FFFA9;
-    box-shadow: 0 0 0 3px rgba(31, 255, 169, 0.1);
-  }
+.chart-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #2cff79, transparent);
+}
 
-  /* Badge styling */
-  .badge-modern {
-    background: linear-gradient(135deg, #1FFFA9, #02c349);
-    color: #000;
-    font-weight: 600;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-  }
+/* Kantoor Card Animation */
+.kantoor-card {
+  background: linear-gradient(135deg, #2cff79, #02c349);
+  border-radius: 16px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  animation: cardGlow 2s ease-in-out infinite alternate;
+  box-shadow: 0 8px 32px rgba(44, 255, 121, 0.3);
+}
 
-  /* Chart containers */
-  .chart-container {
-    background: linear-gradient(135deg, hsl(220 100% 2%), hsl(220 100% 4%));
-    border: 1px solid hsl(160 100% 60% / 0.1);
-    border-radius: 12px;
-    padding: 20px;
-    position: relative;
-    overflow: hidden;
-  }
+.kantoor-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: rotate(45deg);
+  animation: cardShine 3s ease-in-out infinite;
+}
 
-  .chart-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #1FFFA9, transparent);
+@keyframes cardGlow {
+  0% {
+    box-shadow: 0 8px 32px rgba(44, 255, 121, 0.3);
   }
+  100% {
+    box-shadow: 0 12px 48px rgba(44, 255, 121, 0.5);
+  }
+}
+
+@keyframes cardShine {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  50% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+}
+
+/* Welcome popup styling */
+.welcome-popup {
+  background: linear-gradient(135deg, rgba(0, 7, 28, 0.95), rgba(0, 7, 28, 0.9));
+  border: 2px solid rgba(44, 255, 121, 0.3);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 60px rgba(44, 255, 121, 0.2);
+}
+
+.welcome-popup::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #2cff79, #02c349, #2cff79);
+  animation: gradientShift 2s ease infinite;
 }

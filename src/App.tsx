@@ -4,6 +4,7 @@ import { Toaster } from "./components/ui/toaster";
 import { PortfolioProvider } from "./context/PortfolioContext";
 import { WelcomeProvider } from "./context/WelcomeContext";
 import { Layout } from "./components/layout";
+import { WelcomePopup } from "./components/welcome-popup";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Exchange from "./pages/Exchange";
@@ -32,6 +33,7 @@ function App() {
                 <Route path="/portfel" element={<Layout><Portfel /></Layout>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              <WelcomePopup />
               <Toaster />
             </div>
           </Router>
