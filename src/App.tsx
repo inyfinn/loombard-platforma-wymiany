@@ -19,7 +19,7 @@ function App() {
     <ThemeProvider defaultTheme="dark" storageKey="kantoor-theme">
       <PortfolioProvider>
         <WelcomeProvider>
-          <Router>
+          <Router basename={import.meta.env.BASE_URL}>
             <div className="min-h-screen bg-[#00071c]">
               <Routes>
                 <Route path="/" element={<Index />} />
